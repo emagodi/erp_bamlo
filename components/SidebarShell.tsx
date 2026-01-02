@@ -236,87 +236,53 @@ export default function SidebarShell({
     applyMode(next);
   }
   return (
-    <div className="h-dvh overflow-hidden bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+    <div className="h-dvh overflow-hidden bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       <div className="flex h-dvh overflow-hidden">
-        {/* Icon rail */}
-        <div className="hidden md:flex flex-col items-center gap-4 w-16 bg-barmlo-blue border-r border-barmlo-blue/20 py-4">
-          <button
-            className="h-10 w-10 rounded-md border border-white/20 bg-white/10 flex flex-col items-center justify-center hover:bg-white/20 text-white"
-            onClick={() => {
-              if (window.innerWidth >= 1024) {
-                setCollapsed((v) => !v);
-              } else {
-                setOpen((v) => !v);
-              }
-            }}
-            aria-label="Toggle sidebar"
-          >
-            <span className="block w-5 h-0.5 bg-current" />
-            <span className="block w-5 h-0.5 bg-current mt-1.5" />
-            <span className="block w-5 h-0.5 bg-current mt-1.5" />
-          </button>
-          {PAGE_DEFS.filter((p) => !p.roles || p.roles.includes((currentUser?.role as Role) || 'VIEWER')).map((p) => {
-            const active = pathname === p.href || (p.href !== '/' && pathname.startsWith(p.href));
-            return (
-              <Link
-                key={'rail-' + p.href}
-                href={p.href}
-                className={`group relative h-10 w-10 rounded-lg flex items-center justify-center ${active ? 'bg-white/20 text-white' : 'bg-transparent text-white/80 hover:bg-white/10 hover:text-white'}`}
-              >
-                <Icon name={p.icon} className="h-5 w-5" />
-                {/* Tooltip when sidebar collapsed/hidden */}
-                <span className="pointer-events-none absolute left-12 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                  {p.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-
         {/* Sidebar (collapsible); sticky on desktop so content scrolls independently */}
         <aside
-          className={`bg-barmlo-blue border-r border-barmlo-blue/20 transition-all duration-200 ease-in-out w-64
-          ${open ? 'translate-x-0' : '-translate-x-full'} block fixed top-0 left-16 h-dvh z-30
-          lg:translate-x-0 lg:static lg:block lg:sticky lg:top-0 lg:h-dvh ${collapsed ? 'lg:hidden' : 'lg:block'}`}
+          className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-200 ease-in-out
+          ${collapsed ? 'w-20' : 'w-64'}
+          ${open ? 'translate-x-0' : '-translate-x-full'} block fixed top-0 left-0 h-dvh z-30
+          lg:translate-x-0 lg:static lg:block lg:sticky lg:top-0 lg:h-dvh`}
         >
-          <div className="px-6 py-5 flex items-center gap-3">
-            <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden bg-white">
+          <div className={`py-5 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/50 ${collapsed ? 'justify-center px-0' : 'px-6'}`}>
+            <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden bg-gray-50 border border-gray-100">
                <Image src="/barmlo_logo.png" alt="Barmlo Logo" fill className="object-contain p-1" />
             </div>
             <span
-              className={`text-xl font-bold tracking-tight text-white ${collapsed ? 'hidden lg:inline-block lg:opacity-0 lg:w-0' : 'hidden lg:inline-block'}`}
+              className={`text-xl font-bold tracking-tight text-gray-900 dark:text-white transition-opacity duration-200 ${collapsed ? 'hidden opacity-0 w-0' : 'block opacity-100'}`}
             >
               Barmlo
             </span>
           </div>
           <div
-            className={`px-6 pt-4 text-xs font-semibold text-white/60 tracking-wide ${collapsed ? 'hidden lg:block lg:opacity-0' : ''}`}
+            className={`pt-6 pb-2 text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase transition-opacity duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-6'}`}
           >
-            PAGES
+            Main
           </div>
-          <nav className="px-2 py-2 space-y-1">
+          <nav className="px-3 space-y-1">
             {PAGE_DEFS.filter((p) => !p.roles || p.roles.includes((currentUser?.role as Role) || 'VIEWER')).map((item) => {
               const active = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group relative flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+                  className={`group relative flex items-center gap-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  }`}
-                  title={item.label}
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-white'
+                  } ${collapsed ? 'justify-center px-2' : 'px-4'}`}
+                  title={collapsed ? item.label : undefined}
                 >
-                  <Icon name={item.icon} className="h-5 w-5" />
+                  <Icon name={item.icon} className={`h-5 w-5 shrink-0 ${active ? 'text-white' : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300'}`} />
                   <span
-                    className={`${collapsed ? 'hidden lg:inline-block lg:opacity-0 lg:w-0' : ''}`}
+                    className={`whitespace-nowrap transition-all duration-200 ${collapsed ? 'hidden opacity-0 w-0' : 'block opacity-100'}`}
                   >
                     {item.label}
                   </span>
                   {/* Tooltip when collapsed */}
                   {collapsed && (
-                    <span className="pointer-events-none absolute left-16 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="pointer-events-none absolute left-14 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-lg">
                       {item.label}
                     </span>
                   )}
@@ -326,23 +292,23 @@ export default function SidebarShell({
           </nav>
 
           <div
-            className={`px-6 pt-6 text-xs font-semibold text-white/60 tracking-wide ${collapsed ? 'hidden lg:block lg:opacity-0' : ''}`}
+            className={`pt-6 pb-2 text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase transition-opacity duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-6'}`}
           >
-            WIDGETS
+            Widgets
           </div>
-          <nav className="px-2 py-2 space-y-1">
+          <nav className="px-3 space-y-1">
             <div
-              className={`px-4 py-2 text-white/60 text-sm ${collapsed ? 'hidden lg:block lg:opacity-0' : ''}`}
+              className={`py-2 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer transition-all duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-4'}`}
             >
               Cards
             </div>
             <div
-              className={`px-4 py-2 text-white/60 text-sm ${collapsed ? 'hidden lg:block lg:opacity-0' : ''}`}
+              className={`py-2 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer transition-all duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-4'}`}
             >
               Banners
             </div>
             <div
-              className={`px-4 py-2 text-white/60 text-sm ${collapsed ? 'hidden lg:block lg:opacity-0' : ''}`}
+              className={`py-2 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer transition-all duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-4'}`}
             >
               Charts
             </div>
@@ -358,36 +324,47 @@ export default function SidebarShell({
         )}
 
         {/* Main */}
-        <div className={`flex-1 grid grid-rows-[auto_1fr] h-dvh min-h-0 relative`}>
+        <div className={`flex-1 grid grid-rows-[auto_1fr] h-dvh min-h-0 relative bg-gray-50 dark:bg-gray-900`}>
           {/* Background Image */}
-          <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+          <div className="absolute inset-0 z-0 opacity-5 pointer-events-none mix-blend-multiply">
             <Image src="/dashboard_bg.png" alt="" fill className="object-cover" />
           </div>
 
           {/* Topbar */}
-          <header className="bg-barmlo-orange border-b border-white/10 relative z-10">
-            <div className="w-full pl-0 pr-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-4 text-white">
+          <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 relative z-10 shadow-sm">
+            <div className="w-full pl-4 pr-6 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-4">
                 <button
-                  className="md:hidden"
-                  onClick={() => setOpen(true)}
+                  className="p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-md"
+                  onClick={() => {
+                    if (window.innerWidth >= 1024) {
+                      setCollapsed((v) => !v);
+                    } else {
+                      setOpen(true);
+                    }
+                  }}
+                  aria-label="Toggle menu"
                 >
                   <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
-                {/* Breadcrumbs or other header content */}
+                <div className="hidden md:flex items-center text-sm text-gray-500 dark:text-gray-400">
+                  <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">Home</span>
+                  <span className="mx-2">/</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Dashboard</span>
+                </div>
               </div>
               <div className="flex items-center gap-4">
                 <button
                   type="button"
                   onClick={toggleTheme}
-                  className="relative h-9 w-9 rounded-full flex items-center justify-center text-white hover:text-white/80"
+                  className="relative h-9 w-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
                   aria-label="Toggle theme"
                 >
                   <svg
                     viewBox="0 0 24 24"
-                    className="h-6 w-6"
+                    className="h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
@@ -402,12 +379,12 @@ export default function SidebarShell({
                 >
                   <button
                     type="button"
-                    className="relative h-9 w-9 rounded-full flex items-center justify-center text-white hover:text-white/80"
+                    className="relative h-9 w-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
                     aria-label="Pending quotations"
                   >
                     <svg
                       viewBox="0 0 24 24"
-                      className="h-6 w-6"
+                      className="h-5 w-5"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
@@ -416,13 +393,11 @@ export default function SidebarShell({
                       <path d="M9 21h6" />
                     </svg>
                     {pendingCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[1.25rem] rounded-full bg-white px-1.5 py-0.5 text-center text-[10px] font-semibold leading-none text-barmlo-orange">
-                        {pendingCount}
-                      </span>
+                      <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"></span>
                     )}
                   </button>
                   {showNotifications && (
-                    <div className="absolute right-0 mt-3 w-80 rounded-xl border bg-white shadow-lg dark:bg-gray-800 dark:border-gray-700">
+                    <div className="absolute right-0 mt-2 w-80 rounded-xl border border-gray-100 bg-white shadow-xl dark:bg-gray-800 dark:border-gray-700 z-50">
                       <div className="flex items-center justify-between px-4 py-2 border-b text-sm font-semibold dark:border-gray-700">
                         <span>Pending quotations</span>
                         <button
@@ -467,17 +442,16 @@ export default function SidebarShell({
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-3 border-l border-gray-200 pl-3 dark:border-gray-700">
-                  <div className="text-right leading-tight">
-                    <div className="text-sm font-semibold text-white">
+                <div className="flex items-center gap-4 pl-4 border-l border-gray-200 dark:border-gray-700">
+                  <div className="text-right leading-tight hidden sm:block">
+                    <div className="text-sm font-semibold text-gray-900 dark:text-white">
                       {displayName}
                     </div>
-                    <div className="text-xs text-white/80">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       {roleLabel}
-                      {currentUser?.office ? ` - ${officeLabel}` : ''}
                     </div>
                   </div>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-semibold text-barmlo-orange">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 text-sm font-bold ring-2 ring-white dark:ring-gray-800 shadow-sm">
                     {userInitial}
                   </div>
                   <button
@@ -487,15 +461,19 @@ export default function SidebarShell({
                       signOut({ callbackUrl: '/login', redirect: true });
                     }}
                     disabled={isLoggingOut}
-                    className="inline-flex items-center gap-2 rounded-md bg-barmlo-green px-3 py-1 text-sm font-semibold text-white shadow-sm transition hover:bg-barmlo-green/90 focus:outline-none focus:ring-2 focus:ring-barmlo-green focus:ring-offset-2 focus:ring-offset-barmlo-orange disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="p-2 text-gray-500 hover:bg-gray-100 hover:text-red-600 rounded-full transition-colors dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-red-400"
+                    title="Sign out"
                   >
-                    {isLoggingOut && (
-                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    {isLoggingOut ? (
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
                     )}
-                    {isLoggingOut ? 'Logging out...' : 'Logout'}
                   </button>
                 </div>
               </div>
