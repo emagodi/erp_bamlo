@@ -89,9 +89,9 @@ export default function LoginForm() {
         </div>
         
         <div className="mt-8 text-center">
-          <a href="#" className="text-sm text-white font-semibold hover:text-gray-200 drop-shadow-md">
+          {/* <a href="#" className="text-sm text-white font-semibold hover:text-gray-200 drop-shadow-md">
             Create new account
-          </a>
+          </a> */}
         </div>
 
         <div
