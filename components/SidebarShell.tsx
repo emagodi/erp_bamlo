@@ -280,8 +280,8 @@ export default function SidebarShell({
           lg:translate-x-0 lg:static lg:block lg:sticky lg:top-0 lg:h-dvh ${collapsed ? 'lg:hidden' : 'lg:block'}`}
         >
           <div className="px-6 py-5 flex items-center gap-3">
-            <div className="relative h-10 w-10 shrink-0">
-               <Image src="/barmlo_logo.png" alt="Barmlo Logo" fill className="object-contain" />
+            <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden bg-white">
+               <Image src="/barmlo_logo.png" alt="Barmlo Logo" fill className="object-contain p-1" />
             </div>
             <span
               className={`text-xl font-bold tracking-tight text-white ${collapsed ? 'hidden lg:inline-block lg:opacity-0 lg:w-0' : 'hidden lg:inline-block'}`}

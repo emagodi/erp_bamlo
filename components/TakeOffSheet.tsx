@@ -568,7 +568,7 @@ export default function TakeOffSheet() {
         })}
       </div>
 
-      {Object.keys(missingByCode).length > 0 && (
+      {/* {Object.keys(missingByCode).length > 0 && (
         <div className="border rounded p-3 bg-white dark:bg-gray-800 dark:border-gray-700">
           <div className="font-medium mb-2">Unresolved Inputs</div>
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
@@ -595,7 +595,7 @@ export default function TakeOffSheet() {
               ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Manual additional items (e.g., Electrical materials) */}
       <div className="border rounded p-3 bg-white dark:bg-gray-800 dark:border-gray-700 space-y-2">
