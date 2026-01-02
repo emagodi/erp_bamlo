@@ -109,7 +109,7 @@ export default function VerifyGrnForm({
                           min={0}
                           max={item.qtyDelivered}
                           defaultValue={item.qtyDelivered}
-                          className="w-24 rounded-md border border-input bg-transparent px-2 py-1 text-right text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          className="w-24 rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-right text-sm transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
                         />
                       </td>
                       <td className="px-4 py-2 text-right">
@@ -120,7 +120,7 @@ export default function VerifyGrnForm({
                           min={0}
                           max={item.qtyDelivered}
                           defaultValue={0}
-                          className="w-24 rounded-md border border-input bg-transparent px-2 py-1 text-right text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          className="w-24 rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-right text-sm transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
                         />
                       </td>
                     </tr>

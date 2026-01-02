@@ -1,6 +1,7 @@
 "use client";
 import { useState, useTransition } from 'react';
 import { computeAutoQuote, createAutoQuote } from './actions';
+import { CalculatorIcon, CheckCircleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 type BaseRow = { code: string; label: string; value: number };
 
@@ -49,42 +50,111 @@ export default function AutoQuoteForm() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded border bg-white p-4 space-y-3">
-        <div className="font-medium">Enter Base Inputs</div>
-        <div className="grid grid-cols-2 gap-3">
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700 transition-all hover:shadow-md">
+        <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">
+            <CalculatorIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Enter Base Inputs</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Provide measurements for auto-calculation</p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {base.map((r, i) => (
-            <label key={r.code} className="flex items-center gap-2">
-              <span className="w-56 text-sm text-gray-600">{r.label}</span>
-              <input type="number" step="0.01" className="px-2 py-1 border rounded w-40" value={r.value}
-                onChange={(e) => setVal(i, Number(e.target.value))} />
-            </label>
+            <div key={r.code} className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                {r.label}
+              </label>
+              <input 
+                type="number" 
+                step="0.01" 
+                className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 px-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400" 
+                value={r.value}
+                onChange={(e) => setVal(i, Number(e.target.value))} 
+              />
+            </div>
           ))}
         </div>
-        <button onClick={onCompute} className="px-3 py-1 bg-blue-600 text-white rounded" disabled={pending}>
-          {pending ? 'Computing…' : 'Compute from Rules'}
-        </button>
+        
+        <div className="mt-8 flex justify-end">
+          <button 
+            onClick={onCompute} 
+            disabled={pending}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            {pending ? (
+              <>
+                <ArrowPathIcon className="h-4 w-4 animate-spin" />
+                Computing...
+              </>
+            ) : (
+              <>
+                <CalculatorIcon className="h-4 w-4" />
+                Compute from Rules
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {preview.length > 0 && (
-        <div className="rounded border bg-white p-4 space-y-3">
-          <div className="font-medium">Computed Values (select to include as lines)</div>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700 transition-all hover:shadow-md">
+          <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-700">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50 dark:bg-green-900/20">
+              <CheckCircleIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Computed Values</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Select items to include in the quote</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {preview.map((p) => (
-              <label key={p.code} className="flex items-center gap-2">
-                <input type="checkbox" checked={!!selected[p.code]} onChange={() => toggle(p.code)} />
-                <span className="w-72 text-sm text-gray-700">{p.code}</span>
-                <span className="text-sm">{p.value}</span>
+              <label key={p.code} className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800">
+                <input 
+                  type="checkbox" 
+                  checked={!!selected[p.code]} 
+                  onChange={() => toggle(p.code)} 
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                />
+                <div className="flex flex-1 justify-between items-center">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{p.code}</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">{p.value}</span>
+                </div>
               </label>
             ))}
           </div>
-          <button onClick={onCreate} className="px-3 py-1 bg-green-600 text-white rounded" disabled={pending || !Object.values(selected).some(Boolean)}>
-            {pending ? 'Creating…' : 'Create Quote'}
-          </button>
-          {quoteId && (
-            <div className="pt-2">
-              <a className="underline text-blue-700" href={`/quotes/${quoteId}`}>Open created quote</a>
-            </div>
-          )}
+
+          <div className="mt-8 flex justify-end gap-4">
+            <button 
+              onClick={onCreate} 
+              disabled={pending || !Object.values(selected).some(Boolean)}
+              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:ring-4 focus:ring-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              {pending ? (
+                <>
+                  <ArrowPathIcon className="h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <CheckCircleIcon className="h-4 w-4" />
+                  Create Quote
+                </>
+              )}
+            </button>
+            {quoteId && (
+              <a 
+                href={`/quotes/${quoteId}`}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-4 focus:ring-gray-200 transition-all dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+              >
+                Open created quote
+              </a>
+            )}
+          </div>
         </div>
       )}
     </div>

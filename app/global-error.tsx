@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Inter } from 'next/font/google';
+import { Montserrat } from 'next/font/google';
 import '@/app/ui/global.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const montserrat = Montserrat({ subsets: ['latin'] });
 
 export default function GlobalError({
   error,
@@ -19,7 +19,7 @@ export default function GlobalError({
 
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased bg-gray-50 text-gray-900`}>
+      <body className={`${montserrat.className} antialiased bg-gray-50 text-gray-900`}>
         <div className="flex min-h-screen flex-col items-center justify-center p-4">
           <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-xl ring-1 ring-gray-900/5 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">

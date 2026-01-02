@@ -32,13 +32,13 @@ export function ProjectAssigner({ projectId, initialAssigneeId, projectManagers 
   const isChanged = selectedId !== initialAssigneeId;
 
   return (
-    <div className="mt-3 bg-gray-50 p-3 rounded-md border border-gray-100">
-      <label className="block text-xs font-semibold text-gray-700 mb-1">
+    <div className="mt-3 bg-white p-4 rounded-xl border border-gray-100 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 dark:text-gray-400">
         {hasAssignee ? 'Reassign Project Manager' : 'Assign Project Manager'}
       </label>
       <div className="flex items-center gap-2">
         <select
-          className="flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm h-8"
+          className="flex-1 block w-full rounded-lg border-gray-200 bg-gray-50 text-sm focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
           value={selectedId}
           onChange={(e) => setSelectedId(e.target.value)}
           disabled={isPending}
@@ -53,7 +53,7 @@ export function ProjectAssigner({ projectId, initialAssigneeId, projectManagers 
         <button
           onClick={handleAssign}
           disabled={isPending || !selectedId || !isChanged}
-          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:ring-orange-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {isPending ? 'Saving...' : (hasAssignee ? 'Reassign' : 'Assign')}
         </button>

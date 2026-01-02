@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import SubmitButton from '@/components/SubmitButton';
 import Money from '@/components/Money';
 import { createPurchaseOrder } from './actions';
+import { BuildingStorefrontIcon, PhoneIcon, ShoppingCartIcon, TagIcon, CalculatorIcon } from '@heroicons/react/24/outline';
 
 type RequisitionItem = {
   id: string;
@@ -61,40 +62,58 @@ export default function CreatePoForm({
 
   return (
     <form action={clientAction} className="space-y-6">
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Purchase Order Details</h2>
-        <div className="mt-4 grid gap-6 md:grid-cols-2">
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700 transition-all hover:shadow-md">
+        <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">
+            <BuildingStorefrontIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Purchase Order Details</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Enter vendor information for this order</p>
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="vendor" className="text-sm font-medium text-gray-700">
+            <label htmlFor="vendor" className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
               Vendor Name
             </label>
-            <input
-              id="vendor"
-              name="vendor"
-              type="text"
-              required
-              className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="e.g. Bunnings Warehouse"
-            />
+            <div className="relative">
+              <input
+                id="vendor"
+                name="vendor"
+                type="text"
+                required
+                className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
+                placeholder="e.g. Bunnings Warehouse"
+              />
+              <BuildingStorefrontIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            </div>
           </div>
           <div className="space-y-2">
-            <label htmlFor="vendorPhone" className="text-sm font-medium text-gray-700">
+            <label htmlFor="vendorPhone" className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
               Vendor Phone (Optional)
             </label>
-            <input
-              id="vendorPhone"
-              name="vendorPhone"
-              type="tel"
-              className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="e.g. 02 1234 5678"
-            />
+            <div className="relative">
+              <input
+                id="vendorPhone"
+                name="vendorPhone"
+                type="tel"
+                className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
+                placeholder="e.g. 02 1234 5678"
+              />
+              <PhoneIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white shadow-sm">
-        <div className="border-b bg-gray-50 px-6 py-4">
-          <h3 className="text-sm font-semibold text-gray-900">Order Items</h3>
+      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        <div className="flex items-center gap-3 border-b border-gray-100 px-6 py-4 dark:border-gray-700">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 dark:bg-orange-900/20">
+            <ShoppingCartIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+          </div>
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Order Items</h3>
         </div>
         <div className="p-6">
           <div className="overflow-x-auto">

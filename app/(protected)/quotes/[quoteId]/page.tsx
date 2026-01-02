@@ -19,6 +19,18 @@ import {
   endorseQuoteToProject,
 } from '@/app/(protected)/quotes/[quoteId]/actions';
 
+import { 
+  DocumentTextIcon, 
+  CalendarIcon, 
+  MapPinIcon, 
+  UserIcon, 
+  BeakerIcon, 
+  WrenchScrewdriverIcon,
+  TagIcon,
+  LockClosedIcon,
+  PencilSquareIcon
+} from '@heroicons/react/24/outline';
+
 import { prisma } from '@/lib/db';
 
 import { getCurrentUser } from '@/lib/auth';
@@ -888,45 +900,45 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
         </div>
       </header>
 
-      <section className="rounded border bg-white p-4 shadow-sm">
-        <div className="grid gap-2 text-sm md:grid-cols-2">
+      <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        <div className="grid gap-2 text-sm md:grid-cols-2 text-gray-700 dark:text-gray-300">
           <div>
-            <span className="font-semibold">Customer:</span> {quote.customer?.displayName ?? '-'}
+            <span className="font-semibold text-gray-900 dark:text-white">Customer:</span> {quote.customer?.displayName ?? '-'}
           </div>
 
           <div>
-            <span className="font-semibold">Currency:</span> {quote.currency}
+            <span className="font-semibold text-gray-900 dark:text-white">Currency:</span> {quote.currency}
           </div>
 
           <div>
-            <span className="font-semibold">VAT:</span> {vatPercent.toFixed(2)}%
+            <span className="font-semibold text-gray-900 dark:text-white">VAT:</span> {vatPercent.toFixed(2)}%
           </div>
 
           <div>
-            <span className="font-semibold">Created:</span>{' '}
+            <span className="font-semibold text-gray-900 dark:text-white">Created:</span>{' '}
             {new Date(quote.createdAt).toLocaleString()}
           </div>
         </div>
 
-        <div className="mt-4 grid gap-2 text-sm md:grid-cols-3">
+        <div className="mt-4 grid gap-2 text-sm md:grid-cols-3 text-gray-700 dark:text-gray-300">
           <div>
-            <span className="font-semibold">Subtotal:</span> <Money value={totals.subtotal} />
+            <span className="font-semibold text-gray-900 dark:text-white">Subtotal:</span> <Money value={totals.subtotal} />
           </div>
 
           <div>
-            <span className="font-semibold">Discount:</span> <Money value={totals.discount} />
+            <span className="font-semibold text-gray-900 dark:text-white">Discount:</span> <Money value={totals.discount} />
           </div>
 
           <div>
-            <span className="font-semibold">Net:</span> <Money value={totals.net} />
+            <span className="font-semibold text-gray-900 dark:text-white">Net:</span> <Money value={totals.net} />
           </div>
 
           <div>
-            <span className="font-semibold">Tax:</span> <Money value={totals.tax} />
+            <span className="font-semibold text-gray-900 dark:text-white">Tax:</span> <Money value={totals.tax} />
           </div>
 
           <div>
-            <span className="font-semibold">Grand Total:</span> <Money value={totals.grandTotal} />
+            <span className="font-semibold text-gray-900 dark:text-white">Grand Total:</span> <Money value={totals.grandTotal} />
           </div>
         </div>
       </section>
@@ -1072,32 +1084,32 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
       )} */}
 
       {canSalesEndorse && (
-        <section className="rounded border bg-white p-4 shadow-sm">
-          <h2 className="text-lg font-semibold">Sales Endorsement</h2>
-          <p className="mt-1 text-sm text-gray-600">
+        <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Sales Endorsement</h2>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
             Capture the project commencement date and payment schedule for this quote.
           </p>
 
           {project && (
-            <div className="mt-3 space-y-1 rounded-md bg-gray-50 p-3 text-sm text-gray-600">
+            <div className="mt-3 space-y-1 rounded-md bg-gray-50 p-3 text-sm text-gray-600 dark:bg-gray-900/50 dark:text-gray-300">
               <div>
-                <span className="font-semibold text-gray-900">Project ID:</span> {project.id}
+                <span className="font-semibold text-gray-900 dark:text-white">Project ID:</span> {project.id}
               </div>
               <div>
-                <span className="font-semibold text-gray-900">Commences:</span>{' '}
+                <span className="font-semibold text-gray-900 dark:text-white">Commences:</span>{' '}
                 {project.commenceOn ? new Date(project.commenceOn).toLocaleDateString() : 'TBD'}
               </div>
               <div>
-                <span className="font-semibold text-gray-900">Deposit:</span>{' '}
+                <span className="font-semibold text-gray-900 dark:text-white">Deposit:</span>{' '}
                 <Money value={projectDefaults.deposit} />
               </div>
               <div>
-                <span className="font-semibold text-gray-900">Installment:</span>{' '}
+                <span className="font-semibold text-gray-900 dark:text-white">Installment:</span>{' '}
                 <Money value={projectDefaults.installment} />
               </div>
               {projectDefaults.installmentDueOn && (
                 <div>
-                  <span className="font-semibold text-gray-900">Due Date:</span>{' '}
+                  <span className="font-semibold text-gray-900 dark:text-white">Due Date:</span>{' '}
                   {project.installmentDueOn
                     ? new Date(project.installmentDueOn).toLocaleDateString()
                     : 'TBD'}
@@ -1108,7 +1120,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
 
           {canEndorse && (
             <form action={endorseProjectAction} className="mt-4 grid gap-4 md:grid-cols-2">
-              <label className="flex flex-col text-sm font-medium text-gray-700">
+              <label className="flex flex-col text-sm font-medium text-gray-700 dark:text-gray-300">
                 <span>Commencement date</span>
                 <input
                   type="date"
@@ -1116,11 +1128,11 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                   defaultValue={projectDefaults.commenceOn}
                   required
                   min={new Date().toISOString().split('T')[0]}
-                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:focus:ring-indigo-900"
                 />
               </label>
 
-              <label className="flex flex-col text-sm font-medium text-gray-700">
+              <label className="flex flex-col text-sm font-medium text-gray-700 dark:text-gray-300">
                 <span>Deposit (major)</span>
                 <input
                   type="number"
@@ -1129,11 +1141,11 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                   min="0"
                   max={totals.grandTotal}
                   defaultValue={projectDefaults.deposit.toString()}
-                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:focus:ring-indigo-900"
                 />
               </label>
 
-              <label className="flex flex-col text-sm font-medium text-gray-700">
+              <label className="flex flex-col text-sm font-medium text-gray-700 dark:text-gray-300">
                 <span>Installment (major)</span>
                 <input
                   type="number"
@@ -1142,7 +1154,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                   min="0"
                   max={totals.grandTotal}
                   defaultValue={projectDefaults.installment.toString()}
-                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:focus:ring-indigo-900"
                 />
               </label>
 
@@ -1158,7 +1170,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
               />
             </label> */}
 
-              <label className="flex flex-col text-sm">
+              <label className="flex flex-col text-sm font-medium text-gray-700 dark:text-gray-300">
                 <span>Installment Due Date</span>
                 <input
                   name="installmentDueDate"
@@ -1166,13 +1178,13 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                   required
                   min={new Date().toISOString().split('T')[0]}
                   defaultValue={projectDefaults.installmentDueOn}
-                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:focus:ring-indigo-900"
                 />
               </label>
 
               <div className="md:col-span-2 flex items-end">
                 <SubmitButton
-                  className="rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                  className="rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                   loadingText="Saving..."
                 >
                   Endorse & Create Project
@@ -1184,10 +1196,10 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
       )}
 
       {role !== 'SALES' && (
-        <section className="rounded border bg-white p-4 shadow-sm">
+        <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
           <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
             <div className="lg:max-w-md">
-              <h2 className="text-lg font-semibold">Project Assignment</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Project Assignment</h2>
 
               <div className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-300">
                 <div>
@@ -1401,214 +1413,229 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
         </section>
       )}
 
-      <section className="rounded border bg-white shadow-sm">
+      <div className="space-y-8">
         {groups.map((group) => (
-          <div key={group.section} className="border-b last:border-b-0">
-            <div className="border-b bg-gray-50 px-4 py-2 text-lg font-semibold">
-              {group.section}
+          <div key={group.section} className="space-y-4">
+            <div className="rounded-xl bg-blue-50 p-4 border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800 flex items-center gap-3">
+              {group.section === 'MATERIALS' ? (
+                <BeakerIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              ) : group.section === 'LABOUR' ? (
+                <WrenchScrewdriverIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              ) : (
+                <TagIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              )}
+              <h3 className="font-bold text-blue-900 dark:text-blue-100 uppercase tracking-wider text-sm">{group.section}</h3>
             </div>
 
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100 text-left">
-                  <th className="px-2 py-2">#</th>
-
-                  <th className="px-2 py-2">Description</th>
-
-                  <th className="px-2 py-2">Unit</th>
-
-                  <th className="px-2 py-2 text-right">Qty</th>
-
-                  <th className="px-2 py-2 text-right">Rate</th>
-
-                  <th className="px-2 py-2 text-right">Amount</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {group.rows.map((row, idx) => (
-                  <tr key={row.id} className="border-b last:border-b-0">
-                    <td className="px-2 py-2">{idx + 1}</td>
-
-                    <td className="px-2 py-2 align-top">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <span>{row.description}</span>
-
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+              {group.rows.map((row, idx) => (
+                <div 
+                  key={row.id} 
+                  className="relative flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <div className="mb-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                            #{idx + 1}
+                          </span>
+                          {row.unit && (
+                            <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                              {row.unit}
+                            </span>
+                          )}
                           {row.source === 'Manual' && (
-                            <span className="inline-flex items-center rounded bg-purple-100 px-1.5 py-0.5 text-xs font-medium text-purple-700">
-                              Manual{row.addedVersion ? ` (v${row.addedVersion})` : ''}
+                            <span className="inline-flex items-center rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                              MANUAL{row.addedVersion ? ` (v${row.addedVersion})` : ''}
+                            </span>
+                          )}
+                          {!row.isCurrentCycle && (
+                            <span className="inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                              <LockClosedIcon className="h-3 w-3" />
+                              LOCKED (CYCLE {row.cycle})
                             </span>
                           )}
                         </div>
+                        <h4 className="mt-2 font-medium text-gray-900 dark:text-white line-clamp-2">
+                          {row.description}
+                        </h4>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-gray-900 dark:text-white">
+                          <Money value={row.amount} />
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
+                      </div>
+                    </div>
 
-                        {!row.isCurrentCycle && (
-                          <span className="inline-flex w-fit items-center rounded bg-gray-200 px-1.5 py-0.5 text-xs font-medium text-gray-600">
-                            Locked (cycle {row.cycle})
+                    {row.negotiation && (
+                      <div className="mt-3 rounded-lg bg-gray-50 p-2 text-xs dark:bg-gray-700/50">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={clsx(
+                              'inline-flex items-center rounded px-1.5 py-0.5 font-bold',
+                              NEGOTIATION_BADGE_CLASSES[row.negotiation.status]
+                            )}
+                          >
+                            {formatDecisionLabel(row.negotiation.status)}
                           </span>
-                        )}
-
-                        {row.negotiation && (
-                          <div className="flex flex-col gap-1 text-xs text-gray-600">
-                            <span
-                              className={clsx(
-                                'inline-flex w-fit items-center rounded px-1.5 py-0.5 font-semibold',
-
-                                NEGOTIATION_BADGE_CLASSES[row.negotiation.status]
-                              )}
-                            >
-                              Proposal: {formatDecisionLabel(row.negotiation.status)}
-                            </span>
-
-                            <span>
-                              Proposed rate: <Money value={row.negotiation.proposedRate} />
-                            </span>
-
-                            {row.negotiation.status !== 'PENDING' &&
-                              row.negotiation.reviewerName && (
-                                <span>Reviewed by {row.negotiation.reviewerName}</span>
-                              )}
+                          <span className="text-gray-600 dark:text-gray-300">
+                            Prop: <Money value={row.negotiation.proposedRate} />
+                          </span>
+                        </div>
+                        {row.negotiation.status !== 'PENDING' && row.negotiation.reviewerName && (
+                          <div className="mt-1 text-gray-500 dark:text-gray-400">
+                            By {row.negotiation.reviewerName}
                           </div>
                         )}
                       </div>
-                    </td>
+                    )}
+                  </div>
 
-                    <td className="px-2 py-2">{row.unit ?? '-'}</td>
+                  <div className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
+                    <div>
+                      <span className="block text-[10px] uppercase font-semibold text-gray-500 dark:text-gray-400">Quantity</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {row.qty.toLocaleString()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] uppercase font-semibold text-gray-500 dark:text-gray-400">Rate</span>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        {allowEdit ? (
+                          <LineRateEditor
+                            quoteId={quote.id}
+                            lineId={row.id}
+                            defaultRate={row.rate}
+                            defaultQuantity={row.qty}
+                          />
+                        ) : (
+                          <Money value={row.rate} />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-                    <td className="px-2 py-2 text-right">{row.qty.toLocaleString()}</td>
-
-                    <td className="px-2 py-2 text-right">
-                      {allowEdit ? (
-                        <LineRateEditor
-                          quoteId={quote.id}
-                          lineId={row.id}
-                          defaultRate={row.rate}
-                          defaultQuantity={row.qty}
-                        />
-                      ) : (
-                        <Money value={row.rate} />
-                      )}
-
-                      {/* <Money value={row.rate} /> */}
-                    </td>
-
-                    <td className="px-2 py-2 text-right">
-                      <Money value={row.amount} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-
-              <tfoot>
-                <tr className="bg-gray-50">
-                  <td className="px-2 py-2 text-right font-semibold" colSpan={5}>
-                    Section Subtotal
-                  </td>
-
-                  <td className="px-2 py-2 text-right font-semibold">
-                    <Money value={group.subtotal} />
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+            <div className="flex justify-end rounded-xl bg-gray-50 p-4 dark:bg-gray-800/50">
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                {group.section} Subtotal: <span className="ml-2 text-lg font-bold text-gray-900 dark:text-white"><Money value={group.subtotal} /></span>
+              </div>
+            </div>
           </div>
         ))}
-      </section>
-      <section className="rounded border bg-white p-4 shadow-sm">
-        <h2 className="text-lg font-semibold">Versions</h2>
+      </div>
+      <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Versions</h2>
 
-        <div className="mt-3 space-y-3">
+        <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {versions.length === 0 && (
-            <div className="text-sm text-gray-500">No versions recorded yet.</div>
+            <div className="col-span-full text-sm text-gray-500 dark:text-gray-400">No versions recorded yet.</div>
           )}
 
           {versions.map((version, index) => {
             const diff = versionDiffs[index];
 
             return (
-              <div key={version.id} className="rounded border border-gray-200 p-3">
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <div className="text-sm font-semibold">
-                      v{version.version} - {version.label ?? 'Snapshot'}
+              <div 
+                key={version.id} 
+                className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+              >
+                <div>
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                        v{version.version} - {version.label ?? 'Snapshot'}
+                      </div>
+
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(version.createdAt).toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                         Status: {version.status ?? '-'}
+                      </div>
                     </div>
 
-                    <div className="text-xs text-gray-500">
-                      {new Date(version.createdAt).toLocaleString()} - Status:{' '}
-                      {version.status ?? '-'}
+                    <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                      <div className="text-right">
+                        <Money value={version.snapshot.totals.grandTotal} />
+                      </div>
+                      {diff.totalDelta !== null && diff.totalDelta !== 0 && (
+                        <div
+                          className={clsx(
+                            'text-right text-xs',
+                            diff.totalDelta > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
+                          )}
+                        >
+                          {diff.totalDelta > 0 ? '+' : '-'}
+                          <Money value={Math.abs(diff.totalDelta)} />
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="text-sm font-semibold">
-                    Total: <Money value={version.snapshot.totals.grandTotal} />
-                    {diff.totalDelta !== null && diff.totalDelta !== 0 && (
-                      <span
-                        className={clsx(
-                          'ml-2 inline-flex items-center',
+                  <div className="mt-3 space-y-2 text-sm border-t border-gray-100 pt-3 dark:border-gray-700">
+                    {diff.lineChanges.length > 0 ? (
+                      <div>
+                        <div className="font-medium text-gray-900 dark:text-white text-xs uppercase tracking-wide mb-1">Line changes</div>
 
-                          diff.totalDelta > 0 ? 'text-emerald-600' : 'text-red-600'
-                        )}
-                      >
-                        {diff.totalDelta > 0 ? '+' : '-'}
+                        <ul className="space-y-1">
+                          {diff.lineChanges.slice(0, 5).map((change) => (
+                            <li
+                              key={change.lineId}
+                              className="flex items-center justify-between gap-2 text-xs text-gray-600 dark:text-gray-300"
+                            >
+                              <span className="truncate">{change.description}</span>
 
-                        <Money value={Math.abs(diff.totalDelta)} />
-                      </span>
+                              <span className="shrink-0">
+                                {change.previous !== undefined && (
+                                  <span className="mr-2 text-xs text-gray-500 line-through dark:text-gray-500">
+                                    <Money value={change.previous} />
+                                  </span>
+                                )}
+
+                                <Money value={change.current} />
+                              </span>
+                            </li>
+                          ))}
+                          {diff.lineChanges.length > 5 && (
+                             <li className="text-xs text-gray-400 italic">+{diff.lineChanges.length - 5} more changes...</li>
+                          )}
+                        </ul>
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-500 dark:text-gray-400 italic">
+                        No line changes.
+                      </div>
+                    )}
+
+                    {diff.removed.length > 0 && (
+                      <div className="mt-2">
+                        <div className="font-medium text-gray-900 dark:text-white text-xs uppercase tracking-wide mb-1">Removed</div>
+
+                        <ul className="space-y-1">
+                          {diff.removed.slice(0, 3).map((removed) => (
+                            <li
+                              key={removed.lineId}
+                              className="flex items-center justify-between gap-2 text-xs text-gray-600 dark:text-gray-300"
+                            >
+                              <span className="truncate">{removed.description}</span>
+
+                              <span className="shrink-0 text-gray-500 dark:text-gray-400">
+                                <Money value={removed.amount} />
+                              </span>
+                            </li>
+                          ))}
+                           {diff.removed.length > 3 && (
+                             <li className="text-xs text-gray-400 italic">+{diff.removed.length - 3} more removed...</li>
+                          )}
+                        </ul>
+                      </div>
                     )}
                   </div>
-                </div>
-
-                <div className="mt-3 space-y-2 text-sm">
-                  {diff.lineChanges.length > 0 ? (
-                    <div>
-                      <div className="font-medium">Line changes</div>
-
-                      <ul className="mt-1 space-y-1">
-                        {diff.lineChanges.map((change) => (
-                          <li
-                            key={change.lineId}
-                            className="flex items-center justify-between gap-2"
-                          >
-                            <span>{change.description}</span>
-
-                            <span>
-                              {change.previous !== undefined && (
-                                <span className="mr-2 text-xs text-gray-500 line-through">
-                                  <Money value={change.previous} />
-                                </span>
-                              )}
-
-                              <Money value={change.current} />
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-gray-500">
-                      No line changes compared to previous version.
-                    </div>
-                  )}
-
-                  {diff.removed.length > 0 && (
-                    <div>
-                      <div className="font-medium">Removed lines</div>
-
-                      <ul className="mt-1 space-y-1">
-                        {diff.removed.map((removed) => (
-                          <li
-                            key={removed.lineId}
-                            className="flex items-center justify-between gap-2 text-xs"
-                          >
-                            <span>{removed.description}</span>
-
-                            <span className="text-gray-500">
-                              <Money value={removed.amount} />
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -1616,12 +1643,12 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
         </div>
       </section>
       {canViewVersionsAndNegotiations && (
-        <section className="rounded border bg-white p-4 shadow-sm">
-          <h2 className="text-lg font-semibold">Negotiations</h2>
+        <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Negotiations</h2>
 
           <div className="mt-3 space-y-4">
             {negotiationSnapshots.length === 0 && (
-              <div className="text-sm text-gray-500">No negotiations yet.</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">No negotiations yet.</div>
             )}
 
             {negotiationSnapshots.map(
@@ -1643,28 +1670,28 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                 );
 
                 return (
-                  <div key={negotiation.id} className="rounded border border-gray-200 p-3">
+                  <div key={negotiation.id} className="rounded border border-gray-200 p-3 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
                     <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                       <div>
-                        <div className="text-sm font-semibold">
+                        <div className="text-sm font-semibold text-gray-900 dark:text-white">
                           {negotiation.status} - {new Date(negotiation.createdAt).toLocaleString()}
                         </div>
 
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
                           Requested by{' '}
                           {negotiation.createdBy?.name ?? negotiation.createdBy?.email ?? 'Client'}
                         </div>
                       </div>
 
                       <div className="flex flex-col items-end gap-2 text-sm font-semibold">
-                        <div>
+                        <div className="text-gray-900 dark:text-white">
                           Proposal Total: <Money value={proposedSnapshot.totals.grandTotal} />
                           {totalDelta !== 0 && (
                             <span
                               className={clsx(
                                 'ml-2 inline-flex items-center text-xs font-semibold',
 
-                                totalDelta > 0 ? 'text-emerald-600' : 'text-red-600'
+                                totalDelta > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
                               )}
                             >
                               {totalDelta > 0 ? '+' : '-'}
@@ -1680,7 +1707,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                             className="inline-flex"
                           >
                             <SubmitButton
-                              className="inline-flex items-center gap-2 rounded bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                              className="inline-flex items-center gap-2 rounded bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600"
                               loadingText="Closing..."
                             >
                               Close Proposal
@@ -1690,126 +1717,112 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                       </div>
                     </div>
 
-                    <div className="mt-3 overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200 text-xs">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-2 py-1 text-left">Line</th>
+                    <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      {negotiation.items.map((item) => {
+                        const quantity = Number(item.quoteLine?.quantity ?? 0);
 
-                            <th className="px-2 py-1 text-right">Current Rate</th>
+                        const currentRate = item.quoteLine
+                          ? fromMinor(item.quoteLine.unitPriceMinor)
+                          : 0;
 
-                            <th className="px-2 py-1 text-right">Proposed Rate</th>
+                        const proposedRate = deriveRateFromMinor(
+                          item.proposedTotalMinor,
+                          quantity,
+                          vatRate
+                        );
 
-                            <th className="px-2 py-1 text-left">Status</th>
+                        const lineCycle = lineCycleById.get(item.quoteLineId) ?? 0;
 
-                            <th className="px-2 py-1 text-left">Reviewer</th>
+                        const isCurrentCycleLine = lineCycle === activeCycle;
 
-                            <th className="px-2 py-1 text-left">Actions</th>
-                          </tr>
-                        </thead>
+                        const reviewer =
+                          item.reviewedBy?.name ?? item.reviewedBy?.email ?? null;
 
-                        <tbody>
-                          {negotiation.items.map((item) => {
-                            const quantity = Number(item.quoteLine?.quantity ?? 0);
+                        const canAct =
+                          isLatest &&
+                          negotiation.status === 'OPEN' &&
+                          item.status === 'PENDING' &&
+                          isReviewer &&
+                          isCurrentCycleLine;
 
-                            const currentRate = item.quoteLine
-                              ? fromMinor(item.quoteLine.unitPriceMinor)
-                              : 0;
+                        const displayStatus =
+                          item.status === 'REVIEWED' ? 'FINAL' : item.status;
 
-                            const proposedRate = deriveRateFromMinor(
-                              item.proposedTotalMinor,
-                              quantity,
-                              vatRate
-                            );
+                        return (
+                          <div
+                            key={item.id}
+                            className="relative flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                          >
+                            <div className="mb-3">
+                              <h4 className="font-medium text-gray-900 dark:text-white line-clamp-2 text-sm">
+                                {lineDescription.get(item.quoteLineId) ?? 'Line removed'}
+                              </h4>
+                              {!isCurrentCycleLine && (
+                                <span className="mt-1 inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                                  <LockClosedIcon className="h-3 w-3" />
+                                  LOCKED (CYCLE {lineCycle})
+                                </span>
+                              )}
+                            </div>
 
-                            const lineCycle = lineCycleById.get(item.quoteLineId) ?? 0;
-
-                            const isCurrentCycleLine = lineCycle === activeCycle;
-
-                            const reviewer =
-                              item.reviewedBy?.name ?? item.reviewedBy?.email ?? null;
-
-                            const canAct =
-                              isLatest &&
-                              negotiation.status === 'OPEN' &&
-                              item.status === 'PENDING' &&
-                              isReviewer &&
-                              isCurrentCycleLine;
-
-                            const displayStatus =
-                              item.status === 'REVIEWED' ? 'FINAL' : item.status;
-
-                            return (
-                              <tr key={item.id} className="border-b last:border-b-0">
-                                <td className="px-2 py-1">
-                                  {lineDescription.get(item.quoteLineId) ?? 'Line removed'}
-                                </td>
-
-                                <td className="px-2 py-1 text-right">
+                            <div className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700 mb-3">
+                              <div>
+                                <span className="block text-[10px] uppercase font-semibold text-gray-500 dark:text-gray-400">
+                                  Current Rate
+                                </span>
+                                <div className="text-sm font-medium text-gray-900 dark:text-white">
                                   <Money value={currentRate} />
-                                </td>
-
-                                <td className="px-2 py-1 text-right">
+                                </div>
+                              </div>
+                              <div>
+                                <span className="block text-[10px] uppercase font-semibold text-gray-500 dark:text-gray-400">
+                                  Proposed Rate
+                                </span>
+                                <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
                                   <Money value={proposedRate} />
-                                </td>
+                                </div>
+                              </div>
+                            </div>
 
-                                <td className="px-2 py-1">
-                                  <span
-                                    className={clsx(
-                                      'inline-flex items-center rounded px-1.5 py-0.5 font-semibold',
-
-                                      NEGOTIATION_BADGE_CLASSES[
-                                        displayStatus as LineNegotiationInfo['status']
-                                      ]
+                            <div className="flex items-center justify-between gap-2 border-t border-gray-100 pt-3 dark:border-gray-700">
+                              <div className="flex flex-col gap-1">
+                                <span
+                                  className={clsx(
+                                    'inline-flex w-fit items-center rounded px-1.5 py-0.5 text-[10px] font-bold',
+                                    NEGOTIATION_BADGE_CLASSES[
+                                      displayStatus as LineNegotiationInfo['status']
+                                    ]
+                                  )}
+                                >
+                                  {formatDecisionLabel(displayStatus)}
+                                </span>
+                                {reviewer && (
+                                  <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
+                                    <UserIcon className="h-3 w-3" />
+                                    <span>{reviewer}</span>
+                                    {item.reviewedAt && (
+                                      <span>• {new Date(item.reviewedAt).toLocaleDateString()}</span>
                                     )}
-                                  >
-                                    {formatDecisionLabel(displayStatus)}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex items-center">
+                                {canAct ? (
+                                  <NegotiationActionPair
+                                    itemId={item.id}
+                                    initialRate={currentRate}
+                                  />
+                                ) : (
+                                  <span className="text-[10px] text-gray-400 italic">
+                                    {isCurrentCycleLine ? 'No actions' : `Locked`}
                                   </span>
-
-                                  {!isCurrentCycleLine && (
-                                    <span className="mt-1 block text-[10px] uppercase text-gray-400">
-                                      Locked (cycle {lineCycle})
-                                    </span>
-                                  )}
-                                </td>
-
-                                <td className="px-2 py-1 text-xs text-gray-500">
-                                  {reviewer ? (
-                                    <>
-                                      {reviewer}
-
-                                      {item.reviewedAt && (
-                                        <span className="block text-[10px] uppercase text-gray-400">
-                                          {new Date(item.reviewedAt).toLocaleString()}
-                                        </span>
-                                      )}
-                                    </>
-                                  ) : (
-                                    <span className="text-gray-400">
-                                      {isCurrentCycleLine ? '-' : `Locked (cycle ${lineCycle})`}
-                                    </span>
-                                  )}
-                                </td>
-
-                                <td className="px-2 py-1">
-                                  {canAct ? (
-                                    <div className="flex flex-wrap gap-2">
-                                      <NegotiationActionPair
-                                        itemId={item.id}
-                                        initialRate={currentRate}
-                                      />
-                                    </div>
-                                  ) : (
-                                    <span className="text-gray-400">
-                                      {isCurrentCycleLine ? '-' : `Locked (cycle ${lineCycle})`}
-                                    </span>
-                                  )}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 );

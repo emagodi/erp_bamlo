@@ -994,9 +994,11 @@ export default async function DashboardPage({
   const currentPage = Number(page) || 1;
   const today = new Date().toISOString().slice(0, 10);
 
-  const cardData = await fetchCardData();
-  const revenueData = await fetchRevenueData();
-  const recentQuotes = await fetchRecentQuotes();
+  const [cardData, revenueData, recentQuotes] = await Promise.all([
+    fetchCardData(),
+    fetchRevenueData(),
+    fetchRecentQuotes()
+  ]);
 
   const isAdminOrMD = user.role === 'ADMIN' || user.role === 'MANAGING_DIRECTOR';
   const showQuotes = ['QS', 'SENIOR_QS', 'SALES'].includes(user.role);

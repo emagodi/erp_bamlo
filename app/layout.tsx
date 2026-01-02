@@ -1,6 +1,8 @@
 import '@/app/ui/global.css';
-import { inter } from '@/app/ui/fonts';
+import { Montserrat } from 'next/font/google';
 import { Metadata } from 'next';
+
+const montserrat = Montserrat({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
@@ -17,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${montserrat.className} antialiased`}>{children}</body>
     </html>
   );
 }

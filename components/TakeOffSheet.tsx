@@ -5,8 +5,9 @@ import { Parser } from 'expr-eval';
 import { SHEET_COLUMNS, TAKEOFF_LAYOUT } from '@/lib/takeoffLayout';
 import { createQuote, upsertCustomer } from '@/app/(protected)/actions';
 import { QUOTE_LINE_MAP } from '@/lib/quoteMap';
-import { evalExpr, normalizeContext, missingVars } from '@/lib/expr';
+import { normalizeContext, missingVars } from '@/lib/expr';
 import ClearableNumberInput from './ClearableNumberInput';
+import { UserIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon, MapPinIcon, WrenchScrewdriverIcon, BeakerIcon, ArrowDownTrayIcon, PlusIcon, TrashIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 const parser = new Parser({ allowMemberAccess: false });
 
@@ -365,79 +366,123 @@ export default function TakeOffSheet() {
   })();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       {/* Customer & Settings at top */}
-      <div className="grid grid-cols-5 gap-2 bg-white dark:bg-gray-800 p-3 border rounded dark:border-gray-700">
-        <div className="col-span-5 font-medium">Customer & Settings</div>
-        <input
-          className="px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400"
-          placeholder="Customer name"
-          value={customer.name}
-          onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
-        />
-        <input
-          className="px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400"
-          placeholder="Email"
-          value={customer.email}
-          onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
-        />
-        <input
-          className="px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400"
-          placeholder="Phone"
-          value={customer.phone}
-          onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
-        />
-        <input
-          className="px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400"
-          placeholder="City"
-          value={customer.city}
-          onChange={(e) => setCustomer({ ...customer, city: e.target.value })}
-        />
-        <textarea
-          className="col-span-3 px-2 py-1 border rounded"
-          placeholder="Physical Address"
-          rows={3}
-          value={customerAddress}
-          onChange={(e) => setCustomerAddress(e.target.value)}
-        />
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700 transition-all hover:shadow-md">
+        <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">
+            <UserIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Customer Details</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Enter customer information for this quote</p>
+          </div>
+        </div>
 
-        {/*  <input
-          className="px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400"
-          placeholder="Currency"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-        />
-        <input
-          type="number"
-          step="0.0001"
-          className="px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400"
-          placeholder="VAT (e.g., 0.15)"
-          value={vatRate}
-          onChange={(e) => setVatRate(Number(e.target.value))}
-        /> */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Full Name</label>
+            <div className="relative">
+              <input
+                className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
+                placeholder="John Doe"
+                value={customer.name}
+                onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+              />
+              <UserIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Email Address</label>
+            <div className="relative">
+              <input
+                className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
+                placeholder="john@example.com"
+                value={customer.email}
+                onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
+              />
+              <EnvelopeIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Phone Number</label>
+            <div className="relative">
+              <input
+                className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
+                placeholder="+1 (555) 000-0000"
+                value={customer.phone}
+                onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+              />
+              <PhoneIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">City / Location</label>
+            <div className="relative">
+              <input
+                className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
+                placeholder="New York, NY"
+                value={customer.city}
+                onChange={(e) => setCustomer({ ...customer, city: e.target.value })}
+              />
+              <BuildingOfficeIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+
+          <div className="col-span-1 space-y-2 md:col-span-2 lg:col-span-4">
+            <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Physical Address</label>
+            <div className="relative">
+              <textarea
+                className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
+                placeholder="Enter full delivery or billing address..."
+                rows={2}
+                value={customerAddress}
+                onChange={(e) => setCustomerAddress(e.target.value)}
+              />
+              <MapPinIcon className="absolute left-3 top-4 h-4 w-4 text-gray-400" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-6">
         {formError && (
-          <div className="border border-red-300 bg-red-50 text-red-700 rounded p-2 text-sm">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400">
             {formError}
           </div>
         )}
-        <div className="flex gap-2">
+        
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
+            <button
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                tab === 'materials' 
+                  ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-700 dark:text-blue-400' 
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+              }`}
+              onClick={() => setTab('materials')}
+            >
+              <BeakerIcon className="h-4 w-4" />
+              Materials
+            </button>
+            <button
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                tab === 'labour' 
+                  ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-700 dark:text-blue-400' 
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+              }`}
+              onClick={() => setTab('labour')}
+            >
+              <WrenchScrewdriverIcon className="h-4 w-4" />
+              Labour
+            </button>
+          </div>
+
           <button
-            className={`px-3 py-1 rounded ${tab === 'materials' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-            onClick={() => setTab('materials')}
-          >
-            Materials
-          </button>
-          <button
-            className={`px-3 py-1 rounded ${tab === 'labour' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-            onClick={() => setTab('labour')}
-          >
-            Labour
-          </button>
-          <button
-            className="ml-auto px-3 py-1 rounded border bg-white dark:bg-gray-800 dark:border-gray-700"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             onClick={async () => {
               const res = await fetch('/takeoff/export', {
                 method: 'POST',
@@ -456,243 +501,218 @@ export default function TakeOffSheet() {
               URL.revokeObjectURL(url);
             }}
           >
+            <ArrowDownTrayIcon className="h-4 w-4" />
             Generate Excel
           </button>
         </div>
-        {rowsForTab().map((row, rIdx) => {
-          if (row.type === 'heading') {
+
+        <div className="space-y-6">
+          {rowsForTab().map((row, rIdx) => {
+            if (row.type === 'heading') {
+              return (
+                <div key={rIdx} className="flex items-center gap-2 border-b border-gray-200 pb-2 mt-8 mb-4 dark:border-gray-700">
+                  <div className="h-8 w-1 bg-blue-600 rounded-full"></div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-tight">
+                    {row.title}
+                  </h2>
+                </div>
+              );
+            }
+            if (row.type === 'subheading') {
+              return (
+                <h3 key={rIdx} className="text-sm font-bold text-gray-500 uppercase tracking-wider mt-6 mb-3 dark:text-gray-400">
+                  {row.title}
+                </h3>
+              );
+            }
+            const isMaterials = tab === 'materials';
+            const visibleCells =
+              row.type === 'cells'
+                ? row.cells.filter((c) => c && c.label && c.label.trim() !== '' && c.kind === 'input')
+                : [];
+            if (row.type === 'cells' && visibleCells.length === 0) return null;
+            const cols = Math.max(1, visibleCells.length);
             return (
               <div
                 key={rIdx}
-                className="font-extrabold text-xl pt-4 bg-gray-100 dark:bg-gray-900/40 px-2 py-1 border dark:border-gray-700 text-gray-900 dark:text-gray-100"
+                className="grid gap-6"
+                style={{ gridTemplateColumns: `repeat(auto-fit, minmax(250px, 1fr))` }}
               >
-                {row.title}
-              </div>
-            );
-          }
-          if (row.type === 'subheading') {
-            return (
-              <div
-                key={rIdx}
-                className="font-bold text-base pt-2 bg-gray-50 dark:bg-gray-900/30 px-2 py-1 border dark:border-gray-700 text-gray-800 dark:text-gray-200"
-              >
-                {row.title}
-              </div>
-            );
-          }
-          const isMaterials = tab === 'materials';
-          const visibleCells =
-            row.type === 'cells'
-              ? row.cells.filter((c) => c && c.label && c.label.trim() !== '' && c.kind === 'input')
-              : [];
-          if (row.type === 'cells' && visibleCells.length === 0) return null;
-          const cols = Math.max(1, visibleCells.length);
-          return (
-            <div
-              key={rIdx}
-              className="grid"
-              style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-            >
-              {visibleCells.map((cell, cIdx) => {
-                const isInput = cell!.kind === 'input';
-                const defaultVal = TAKEOFF_DEFAULTS[cell!.code] ?? 0;
-                const value = isInput
-                  ? (vals[cell!.code] ?? defaultVal)
-                  : (context as any)[cell!.code];
-                return (
-                  <div
-                    key={cIdx}
-                    className={`border border-gray-300 dark:border-gray-700 p-2 h-28 flex flex-col justify-between bg-white dark:bg-gray-800`}
-                  >
-                    <div className="font-semibold text-sm">{cell!.label}</div>
-                    <div>
-                      {isInput ? (
-                        cell!.code === 'A2' ? (
-                          <select
-                            className="w-full px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-                            value={value ?? TAKEOFF_DEFAULTS.A2}
-                            onChange={(e) =>
-                              setVals((v) => ({ ...v, [cell!.code]: Number(e.target.value) }))
-                            }
-                          >
-                            {[3000, 5000, 7000].map((option) => (
-                              <option key={option} value={option}>
-                                {option.toLocaleString()}
-                              </option>
-                            ))}
-                          </select>
+                {visibleCells.map((cell, cIdx) => {
+                  const isInput = cell!.kind === 'input';
+                  const defaultVal = TAKEOFF_DEFAULTS[cell!.code] ?? 0;
+                  const value = isInput
+                    ? (vals[cell!.code] ?? defaultVal)
+                    : (context as any)[cell!.code];
+                  return (
+                    <div
+                      key={cIdx}
+                      className="group rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md dark:bg-gray-800 dark:border-gray-700"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                          {cell!.label}
+                        </label>
+                        <span className="text-[10px] font-mono text-gray-300 dark:text-gray-600">{cell!.code}</span>
+                      </div>
+                      
+                      <div className="relative">
+                        {isInput ? (
+                          cell!.code === 'A2' ? (
+                            <select
+                              className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2 px-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400"
+                              value={value ?? TAKEOFF_DEFAULTS.A2}
+                              onChange={(e) =>
+                                setVals((v) => ({ ...v, [cell!.code]: Number(e.target.value) }))
+                              }
+                            >
+                              {[3000, 5000, 7000].map((option) => (
+                                <option key={option} value={option}>
+                                  {option.toLocaleString()}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <ClearableNumberInput
+                              type="number"
+                              step={cell!.code === 'B2' || cell!.code === 'C2' ? 0.01 : 'any'}
+                              className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-2 px-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-blue-400 placeholder:text-gray-400"
+                              value={Number.isFinite(value) ? (value as number) : ''}
+                              placeholder={String(TAKEOFF_DEFAULTS[cell!.code] ?? 0)}
+                              onChange={(e) => {
+                                const raw = e.currentTarget.value;
+                                setVals((v) => ({
+                                  ...v,
+                                  [cell!.code]: raw === '' ? Number.NaN : Number(raw),
+                                }));
+                              }}
+                            />
+                          )
                         ) : (
-                          <ClearableNumberInput
-                            type="number"
-                            step={cell!.code === 'B2' || cell!.code === 'C2' ? 0.01 : 'any'}
-                            className="w-full border border-gray-300 px-2 py-1 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                            value={Number.isFinite(value) ? (value as number) : ''}
-                            placeholder={String(TAKEOFF_DEFAULTS[cell!.code] ?? 0)}
-                            onChange={(e) => {
-                              const raw = e.currentTarget.value;
-                              setVals((v) => ({
-                                ...v,
-                                [cell!.code]: raw === '' ? Number.NaN : Number(raw),
-                              }));
-                            }}
-                          />
-                        )
-                      ) : (
-                        <>
-                          <div className="text-red-600 font-semibold">
+                          <div className="rounded-lg bg-gray-50 py-2 px-3 text-sm font-semibold text-gray-900 dark:bg-gray-900/50 dark:text-white border border-transparent">
                             {Number.isFinite(value) ? Number((value as number).toFixed(4)) : '—'}
                           </div>
-                          {!!missingByCode[cell!.code]?.length && (
-                            <div className="text-[10px] text-gray-500 dark:text-gray-400">
-                              Needs: {missingByCode[cell!.code].join(', ')}
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      {cell!.expr ? (
-                        <div className="text-red-500 font-mono">
+                        )}
+                        
+                        {!isInput && !!missingByCode[cell!.code]?.length && (
+                          <div className="mt-1 text-[10px] text-red-500">
+                            Missing: {missingByCode[cell!.code].join(', ')}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {cell!.expr && (
+                        <div className="mt-2 text-[10px] text-gray-400 font-mono truncate opacity-0 group-hover:opacity-100 transition-opacity">
                           {renderFormula(cell!.expr!, cell!.code)}
                         </div>
-                      ) : (
-                        <span />
                       )}
-                      <span />
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* {Object.keys(missingByCode).length > 0 && (
-        <div className="border rounded p-3 bg-white dark:bg-gray-800 dark:border-gray-700">
-          <div className="font-medium mb-2">Unresolved Inputs</div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-            Enter values for these referenced cells to compute all formulas.
+      {/* Manual additional items */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700 transition-all hover:shadow-md">
+        <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-50 dark:bg-purple-900/20">
+            <PlusIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {Array.from(new Set(Object.values(missingByCode).flat()))
-              .filter((code) => vals[code] === undefined) // show only ones not already inputs
-              .map((code) => (
-                <label key={code} className="text-xs flex items-center gap-2">
-                  <span className="w-12 font-mono text-gray-500 dark:text-gray-400">{code}</span>
-                  <ClearableNumberInput
-                    className="flex-1 border border-gray-300 px-2 py-1 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
-                    value={Number.isFinite(vals[code]) ? vals[code] : ''}
-                    onChange={(e) => {
-                      const raw = e.currentTarget.value;
-                      setVals((v) => ({
-                        ...v,
-                        [code]: raw === '' ? Number.NaN : Number(raw),
-                      }));
-                    }}
-                  />
-                </label>
-              ))}
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Manual Items</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Add extra items not covered above</p>
           </div>
         </div>
-      )} */}
 
-      {/* Manual additional items (e.g., Electrical materials) */}
-      <div className="border rounded p-3 bg-white dark:bg-gray-800 dark:border-gray-700 space-y-2">
-        <div className="font-medium">Manual Items (optional)</div>
-        <table className="w-full text-sm border border-gray-300 dark:border-gray-700">
-          <thead>
-            <tr className="bg-gray-100 dark:bg-gray-900/30 text-left">
-              <th className="px-2 py-1">Description</th>
-              <th className="px-2 py-1 w-24">Unit</th>
-              <th className="px-2 py-1 w-24">Qty</th>
-              <th className="px-2 py-1 w-24">Rate</th>
-              <th className="px-2 py-1 w-48">Section</th>
-              <th className="px-2 py-1 w-20">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {customItems.map((ci, idx) => (
-              <tr key={idx} className="border-t dark:border-gray-700">
-                <td className="px-2 py-1">
-                  <input
-                    className="w-full px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-                    value={ci.description}
-                    onChange={(e) =>
-                      setCustomItems((arr) =>
-                        arr.map((x, i) => (i === idx ? { ...x, description: e.target.value } : x))
+        <div className="space-y-4">
+          {customItems.map((ci, idx) => (
+            <div key={idx} className="flex flex-col gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:bg-gray-900/50 dark:border-gray-700 md:flex-row md:items-start">
+              <div className="flex-1 space-y-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Description</label>
+                <input
+                  className="block w-full rounded-lg border border-gray-200 bg-white py-1.5 px-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  placeholder="Item description"
+                  value={ci.description}
+                  onChange={(e) =>
+                    setCustomItems((arr) =>
+                      arr.map((x, i) => (i === idx ? { ...x, description: e.target.value } : x))
+                    )
+                  }
+                />
+              </div>
+              <div className="w-full md:w-24 space-y-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Unit</label>
+                <input
+                  className="block w-full rounded-lg border border-gray-200 bg-white py-1.5 px-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  placeholder="ea"
+                  value={ci.unit}
+                  onChange={(e) =>
+                    setCustomItems((arr) =>
+                      arr.map((x, i) => (i === idx ? { ...x, unit: e.target.value } : x))
+                    )
+                  }
+                />
+              </div>
+              <div className="w-full md:w-24 space-y-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Qty</label>
+                <ClearableNumberInput
+                  className="block w-full rounded-lg border border-gray-200 bg-white py-1.5 px-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  value={Number.isFinite(ci.qty) ? ci.qty : ''}
+                  onChange={(e) => {
+                    const raw = e.currentTarget.value;
+                    setCustomItems((arr) =>
+                      arr.map((x, i) =>
+                        i === idx ? { ...x, qty: raw === '' ? Number.NaN : Number(raw) } : x
                       )
-                    }
-                  />
-                </td>
-                <td className="px-2 py-1">
-                  <input
-                    className="w-full px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-                    value={ci.unit}
-                    onChange={(e) =>
-                      setCustomItems((arr) =>
-                        arr.map((x, i) => (i === idx ? { ...x, unit: e.target.value } : x))
+                    );
+                  }}
+                />
+              </div>
+              <div className="w-full md:w-24 space-y-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Rate</label>
+                <ClearableNumberInput
+                  className="block w-full rounded-lg border border-gray-200 bg-white py-1.5 px-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  value={Number.isFinite(ci.rate) ? ci.rate : ''}
+                  onChange={(e) => {
+                    const raw = e.currentTarget.value;
+                    setCustomItems((arr) =>
+                      arr.map((x, i) =>
+                        i === idx ? { ...x, rate: raw === '' ? Number.NaN : Number(raw) } : x
                       )
-                    }
-                  />
-                </td>
-                <td className="px-2 py-1">
-                  <ClearableNumberInput
-                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                    value={Number.isFinite(ci.qty) ? ci.qty : ''}
-                    onChange={(e) => {
-                      const raw = e.currentTarget.value;
-                      setCustomItems((arr) =>
-                        arr.map((x, i) =>
-                          i === idx ? { ...x, qty: raw === '' ? Number.NaN : Number(raw) } : x
-                        )
-                      );
-                    }}
-                  />
-                </td>
-                <td className="px-2 py-1">
-                  <ClearableNumberInput
-                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                    value={Number.isFinite(ci.rate) ? ci.rate : ''}
-                    onChange={(e) => {
-                      const raw = e.currentTarget.value;
-                      setCustomItems((arr) =>
-                        arr.map((x, i) =>
-                          i === idx ? { ...x, rate: raw === '' ? Number.NaN : Number(raw) } : x
-                        )
-                      );
-                    }}
-                  />
-                </td>
-                <td className="px-2 py-1">
-                  <input
-                    className="w-full px-2 py-1 border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-                    placeholder="e.g., ELECTRICAL"
-                    value={ci.section}
-                    onChange={(e) =>
-                      setCustomItems((arr) =>
-                        arr.map((x, i) => (i === idx ? { ...x, section: e.target.value } : x))
-                      )
-                    }
-                  />
-                </td>
-                <td className="px-2 py-1">
-                  <button
-                    type="button"
-                    className="text-red-600"
-                    onClick={() => setCustomItems((arr) => arr.filter((_, i) => i !== idx))}
-                  >
-                    Remove
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div>
+                    );
+                  }}
+                />
+              </div>
+              <div className="w-full md:w-32 space-y-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Section</label>
+                <input
+                  className="block w-full rounded-lg border border-gray-200 bg-white py-1.5 px-3 text-sm text-gray-900 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  placeholder="Section"
+                  value={ci.section}
+                  onChange={(e) =>
+                    setCustomItems((arr) =>
+                      arr.map((x, i) => (i === idx ? { ...x, section: e.target.value } : x))
+                    )
+                  }
+                />
+              </div>
+              <div className="pt-6">
+                <button
+                  type="button"
+                  className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 transition-colors"
+                  onClick={() => setCustomItems((arr) => arr.filter((_, i) => i !== idx))}
+                >
+                  <TrashIcon className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          ))}
           <button
             type="button"
-            className="px-3 py-1 bg-gray-800 text-white rounded"
+            className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400"
             onClick={() =>
               setCustomItems((arr) => [
                 ...arr,
@@ -700,26 +720,35 @@ export default function TakeOffSheet() {
               ])
             }
           >
-            Add Row
+            <PlusIcon className="h-4 w-4" />
+            Add Another Item
           </button>
         </div>
       </div>
 
-      <div className="border rounded p-3 bg-white dark:bg-gray-800 dark:border-gray-700 flex items-center justify-around">
-        {/*  <div className="font-semibold">
-           Items to include (qty {'>'} 0): {itemCount}
-        </div> */}
-        <button
-          className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-          disabled={creating}
-          onClick={onCreateQuote}
-        >
-          {creating ? 'Generating…' : 'Generate Quotation'}
-        </button>
+      <div className="sticky bottom-6 z-10 mx-auto max-w-2xl rounded-2xl border border-gray-200 bg-white/90 p-4 shadow-lg backdrop-blur-sm dark:bg-gray-800/90 dark:border-gray-700">
+        <div className="flex items-center justify-between gap-4">
+           <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+             Ready to generate?
+           </div>
+          <button
+            className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-green-700 hover:shadow-lg focus:ring-4 focus:ring-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={creating}
+            onClick={onCreateQuote}
+          >
+            {creating ? (
+              <>Generating...</>
+            ) : (
+              <>
+                <CheckCircleIcon className="h-5 w-5" />
+                Generate Quotation
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {/* Extra space at the end to keep bottom button visible when scrolling */}
-      <div className="h-32" />
+      <div className="h-12" />
     </div>
   );
 }

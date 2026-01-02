@@ -26,9 +26,9 @@ export default function AssignDriverForm({
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
         <select
-          className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="rounded-lg border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
           value={selectedDriver}
           onChange={(e) => setSelectedDriver(e.target.value)}
           disabled={isPending}
@@ -44,7 +44,7 @@ export default function AssignDriverForm({
            onClick={handleAssign}
            disabled={!selectedDriver || isPending}
            className={clsx(
-             "inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+             "inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
            )}
         >
           {isPending ? 'Assigning...' : 'Assign & Hand Over'}
