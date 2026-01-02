@@ -5,7 +5,13 @@ import { getCurrentUser } from '@/lib/auth';
 import { assertRole } from '@/lib/workflow';
 import { redirect } from 'next/navigation';
 import clsx from 'clsx';
-import { DocumentTextIcon, CalendarIcon, MapPinIcon, UserIcon, ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { 
+  PlusIcon,
+  EyeIcon,
+  PencilSquareIcon
+} from '@heroicons/react/24/outline';
+import QuoteTableToolbar from './components/QuoteTableToolbar';
+import QuotePagination from './components/QuotePagination';
 
 const STATUS_BADGE: Record<string, string> = {
   DRAFT: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
@@ -17,42 +23,102 @@ const STATUS_BADGE: Record<string, string> = {
   ARCHIVED: 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
 };
 
-export default async function QuotesPage() {
+// Map status to Impazamon style "Waiting for assessment" red pill etc. if needed, 
+// but sticking to existing logic with rounded pills is safer for now, just styled similarly.
+// Impazamon: Red pill "Waiting for assessment"
+
+export default async function QuotesPage(props: { searchParams: { [key: string]: string | string[] | undefined } }) {
+  const searchParams = await props.searchParams;
   const me = await getCurrentUser();
 
-  // If not authenticated, redirect immediately (don’t render a fallback first)
-  if (!me) redirect('/login'); // or wherever your login/landing is
+  // If not authenticated, redirect immediately
+  if (!me) redirect('/login');
 
   const role = assertRole(me.role);
 
-  // Authorize without try/catch; let redirect throw and bubble.
+  // Authorize
   const allowed = new Set(['QS', 'SENIOR_QS', 'SALES', 'ADMIN']);
   if (!allowed.has(role)) {
     redirect('/projects');
   }
 
-  // Role-based filters
+  // Parsing search params
+  const page = Number(searchParams.page) || 1;
+  const pageSize = Number(searchParams.limit) || 20;
+  const statusFilter = searchParams.status as string | undefined;
+  const searchQuery = searchParams.q as string | undefined;
+
+  const skip = (page - 1) * pageSize;
+
+  // Role-based filters + Search filters
   let where: any = {};
+
+  // Base role filter
   if (role === 'QS') {
-    where = { status: 'DRAFT' /*, createdById: me.id */ };
+    where = { ...where, status: 'DRAFT' /*, createdById: me.id */ };
   } else if (role === 'SENIOR_QS') {
-    where = { status: { in: ['SUBMITTED_REVIEW', 'NEGOTIATION', 'REVIEWED'] } };
+    where = { ...where, status: { in: ['SUBMITTED_REVIEW', 'NEGOTIATION', 'REVIEWED'] } };
   } else if (role === 'SALES') {
-    where = { status: { in: ['REVIEWED', 'SENT_TO_SALES', 'NEGOTIATION'] } };
+    where = { ...where, status: { in: ['REVIEWED', 'SENT_TO_SALES', 'NEGOTIATION'] } };
   } // ADMIN sees all
 
-  const quotes = await prisma.quote.findMany({
-    where,
-    orderBy: { updatedAt: 'desc' },
-    select: {
-      id: true,
-      number: true,
-      status: true,
-      updatedAt: true,
-      customer: { select: { displayName: true, city: true } },
-    },
-    take: 100,
-  });
+  // Override role filter if status is explicitly requested (and allowed? For now assuming filters are additive or strict override)
+  // Actually, usually users filter WITHIN their allowed scope.
+  // So if I am QS, I can only see DRAFT. If I select "FINALIZED" in filter, I should see nothing or the filter should be hidden.
+  // For simplicity, I will AND the filters.
+  if (statusFilter) {
+    // If role has restrictions, ensure we don't breach them.
+    // E.g. if role=QS (only DRAFT), and user filters FINALIZED, result is empty.
+    // The where clause for role is already set. I should merge them.
+    if (where.status) {
+        if (typeof where.status === 'string') {
+            if (where.status !== statusFilter) {
+                // Conflict: Role says DRAFT, Filter says FINALIZED -> Empty
+                where = { ...where, status: 'IMPOSSIBLE_STATUS' };
+            }
+        } else if (where.status.in) {
+             if (!where.status.in.includes(statusFilter)) {
+                 where = { ...where, status: 'IMPOSSIBLE_STATUS' };
+             } else {
+                 where.status = statusFilter;
+             }
+        }
+    } else {
+        where.status = statusFilter;
+    }
+  }
+
+  // Search filter
+  if (searchQuery) {
+    where = {
+        ...where,
+        OR: [
+            { number: { contains: searchQuery, mode: 'insensitive' } },
+            { customer: { displayName: { contains: searchQuery, mode: 'insensitive' } } },
+            { customer: { city: { contains: searchQuery, mode: 'insensitive' } } },
+        ]
+    };
+  }
+
+  const [quotes, total] = await Promise.all([
+    prisma.quote.findMany({
+      where,
+      orderBy: { updatedAt: 'desc' },
+      select: {
+        id: true,
+        number: true,
+        status: true,
+        updatedAt: true,
+        createdAt: true,
+        customer: { select: { displayName: true, city: true } },
+        createdById: true, // To show "Logged By" if we want
+        createdBy: { select: { name: true, email: true } }
+      },
+      skip,
+      take: pageSize,
+    }),
+    prisma.quote.count({ where }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -72,74 +138,85 @@ export default async function QuotesPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {quotes.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-gray-50 py-12 text-center dark:border-gray-700 dark:bg-gray-800/50">
-            <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No quotes found</h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new quote.</p>
-          </div>
-        )}
-        
-        {quotes.map((q) => (
-          <div 
-            key={q.id} 
-            className="group relative flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-          >
-            <div className="space-y-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
-                    <DocumentTextIcon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 dark:text-white">
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 p-4">
+        <QuoteTableToolbar />
+
+        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-900/50">
+              <tr>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Ref. No.</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Customer</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Location</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Date</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Logged By</th>
+                <th scope="col" className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
+                <th scope="col" className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Action(s)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+              {quotes.length === 0 ? (
+                 <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                       No quotes found matching your criteria.
+                    </td>
+                 </tr>
+              ) : (
+                quotes.map((q) => (
+                  <tr key={q.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
                       {q.number ?? q.id.slice(0, 8)}
-                    </h3>
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                      Ref ID
-                    </p>
-                  </div>
-                </div>
-                <span
-                  className={clsx(
-                    'rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide',
-                    STATUS_BADGE[q.status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                  )}
-                >
-                  {q.status.replace(/_/g, ' ')}
-                </span>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
-                  <UserIcon className="h-4 w-4 shrink-0 text-gray-400" />
-                  <span className="truncate font-medium">{q.customer?.displayName || 'Walk-in Customer'}</span>
-                </div>
-                {q.customer?.city && (
-                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
-                    <MapPinIcon className="h-4 w-4 shrink-0 text-gray-400" />
-                    <span className="truncate">{q.customer.city}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
-                  <CalendarIcon className="h-4 w-4 shrink-0 text-gray-400" />
-                  <span>{new Date(q.updatedAt).toLocaleDateString()}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 border-t border-gray-100 pt-4 dark:border-gray-700">
-              <Link
-                href={`/quotes/${q.id}`}
-                className="flex items-center justify-between text-sm font-bold text-blue-600 transition-colors group-hover:text-blue-700 dark:text-blue-400 dark:group-hover:text-blue-300"
-              >
-                View Details
-                <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </div>
-          </div>
-        ))}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                      {q.customer?.displayName || 'Walk-in Customer'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                      {q.customer?.city || '-'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                      {new Date(q.updatedAt).toLocaleDateString()} <span className="text-xs text-gray-400">{new Date(q.updatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                      {q.createdBy?.name || q.createdBy?.email || '-'}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span
+                        className={clsx(
+                          'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide',
+                          STATUS_BADGE[q.status] || 'bg-gray-100 text-gray-800'
+                        )}
+                      >
+                        {q.status.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        {/* Edit Button - Blue */}
+                        <Link
+                            href={`/quotes/${q.id}`}
+                            className="flex items-center gap-1 rounded border border-blue-500 px-2 py-1 text-xs font-bold text-blue-600 transition-colors hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                        >
+                            <PencilSquareIcon className="h-3.5 w-3.5" />
+                            Edit
+                        </Link>
+                        {/* View Button - Green */}
+                        <Link
+                            href={`/quotes/${q.id}`}
+                            className="flex items-center gap-1 rounded border border-emerald-500 px-2 py-1 text-xs font-bold text-emerald-600 transition-colors hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                        >
+                            <EyeIcon className="h-3.5 w-3.5" />
+                            View
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        <QuotePagination total={total} currentPage={page} pageSize={pageSize} />
       </div>
     </div>
   );
