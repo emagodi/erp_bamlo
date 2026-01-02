@@ -130,7 +130,7 @@ export default async function QuotesPage(props: { searchParams: { [key: string]:
         <div className="flex gap-3">
           <Link
             href="/quotes/new/worksheet"
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg dark:bg-blue-500 dark:hover:bg-blue-600"
+            className="inline-flex items-center gap-2 rounded-xl bg-barmlo-blue px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:bg-barmlo-blue/90 hover:shadow-lg dark:bg-blue-500 dark:hover:bg-blue-600"
           >
             <PlusIcon className="h-4 w-4" />
             New Worksheet
@@ -145,7 +145,6 @@ export default async function QuotesPage(props: { searchParams: { [key: string]:
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900/50">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Ref. No.</th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Customer</th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Location</th>
                 <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Date</th>
@@ -164,9 +163,6 @@ export default async function QuotesPage(props: { searchParams: { [key: string]:
               ) : (
                 quotes.map((q) => (
                   <tr key={q.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                      {q.number ?? q.id.slice(0, 8)}
-                    </td>
                     <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                       {q.customer?.displayName || 'Walk-in Customer'}
                     </td>
@@ -194,7 +190,7 @@ export default async function QuotesPage(props: { searchParams: { [key: string]:
                         {/* Edit Button - Blue */}
                         <Link
                             href={`/quotes/${q.id}`}
-                            className="flex items-center gap-1 rounded border border-blue-500 px-2 py-1 text-xs font-bold text-blue-600 transition-colors hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                            className="flex items-center gap-1 rounded border border-barmlo-blue px-2 py-1 text-xs font-bold text-barmlo-blue transition-colors hover:bg-barmlo-blue/10 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
                         >
                             <PencilSquareIcon className="h-3.5 w-3.5" />
                             Edit

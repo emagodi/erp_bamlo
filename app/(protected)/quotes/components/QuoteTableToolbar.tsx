@@ -51,7 +51,7 @@ export default function QuoteTableToolbar() {
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg bg-blue-50 p-2 dark:bg-gray-800 border border-blue-100 dark:border-gray-700 mb-4">
       <div className="flex items-center gap-2">
-         <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">Show</span>
+         <span className="bg-barmlo-blue text-white px-2 py-1 rounded text-xs font-bold shadow-sm">Show</span>
          <select
             value={pageSize}
             onChange={(e) => {
@@ -74,7 +74,7 @@ export default function QuoteTableToolbar() {
       </div>
 
       <div className="flex items-center gap-2">
-         <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">Status</span>
+         <span className="bg-barmlo-blue text-white px-2 py-1 rounded text-xs font-bold shadow-sm">Status</span>
          <select
             value={status}
             onChange={(e) => {
@@ -97,7 +97,7 @@ export default function QuoteTableToolbar() {
       </div>
 
       <div className="flex items-center gap-2">
-         <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">Age</span>
+         <span className="bg-barmlo-blue text-white px-2 py-1 rounded text-xs font-bold shadow-sm">Age</span>
          <select
             disabled
             className="rounded border-gray-300 py-1 text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 shadow-sm bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -123,7 +123,7 @@ export default function QuoteTableToolbar() {
         <button
             onClick={handleSearch}
             disabled={isPending}
-            className="flex items-center gap-1 rounded bg-blue-100 px-3 py-1 text-sm font-bold text-blue-700 hover:bg-blue-200 dark:bg-blue-900/50 dark:text-blue-300 shadow-sm border border-blue-200 dark:border-blue-800"
+            className="flex items-center gap-1 rounded bg-barmlo-blue/10 px-3 py-1 text-sm font-bold text-barmlo-blue hover:bg-barmlo-blue/20 dark:bg-blue-900/50 dark:text-blue-300 shadow-sm border border-barmlo-blue/20 dark:border-blue-800"
         >
             <MagnifyingGlassIcon className="h-4 w-4" />
             Search
