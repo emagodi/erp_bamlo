@@ -16,7 +16,7 @@ type PageDef = NavItem & { roles?: Role[] };
 
 const PAGE_DEFS: PageDef[] = [
   // Dashboard
-  { label: 'Dashboard', href: '/dashboard', icon: 'dashboard', roles: [] },
+  { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
   // My Quotes: QS, SENIOR_QS, SALES, ADMIN
   { label: 'My Quotes', href: '/quotes', icon: 'quote', roles: ['QS', 'SENIOR_QS', 'SALES', 'ADMIN'] },
   // New Quote: QS, SENIOR_QS, ADMIN
