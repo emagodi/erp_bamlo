@@ -53,7 +53,7 @@ RUN npm install -g prisma@6.16.2
 
 # Copy entrypoint script
 COPY --chown=nextjs:nodejs scripts/docker-entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
+RUN sed -i 's/\r$//' ./entrypoint.sh && chmod +x ./entrypoint.sh
 
 USER nextjs
 
