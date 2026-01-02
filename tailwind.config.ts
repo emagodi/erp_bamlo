@@ -11,9 +11,9 @@ export default {
     extend: {
       colors: {
         barmlo: {
-          blue: '#1e3a8a', // Deep Royal Blue
+          blue: '#1e3a8a', // Deep Royal Blue (Sign Background)
           green: '#10b981', // Emerald Green
-          orange: '#f97316', // Bright Orange
+          orange: '#f59e0b', // Amber/Orange (Logo Circles)
         },
       },
     },

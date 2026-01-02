@@ -285,11 +285,11 @@ export default function SidebarShell({
               Barmlo
             </span>
           </div>
-          <div
+          {/* <div
             className={`pt-6 pb-2 text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase transition-opacity duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-6'}`}
           >
             Main
-          </div>
+          </div> */}
           <nav className="px-3 space-y-1">
             {PAGE_DEFS.filter((p) => !p.roles || p.roles.includes((currentUser?.role as Role) || 'VIEWER')).map((item) => {
               const active = pathname === item.href;
@@ -299,7 +299,7 @@ export default function SidebarShell({
                   href={item.href}
                   className={`group relative flex items-center gap-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                      ? 'bg-barmlo-blue text-white shadow-md shadow-barmlo-blue/20'
                       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-white'
                   } ${collapsed ? 'justify-center px-2' : 'px-4'}`}
                   title={collapsed ? item.label : undefined}

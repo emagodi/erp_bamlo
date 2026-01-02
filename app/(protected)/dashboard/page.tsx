@@ -393,7 +393,7 @@ async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId
                  if (item.type === 'PENDING_DISPATCH') {
                     const data = item.data as any; // { id, projectNumber, quote: { customer }, pendingCount }
                     return (
-                     <div key={`pending-dispatch-${data.id}`} className="block rounded-lg border border-gray-200 p-4 hover:border-blue-300 transition-all border-l-4 border-l-blue-400">
+                     <div key={`pending-dispatch-${data.id}`} className="block rounded-lg border border-gray-200 p-4 hover:border-barmlo-blue/50 transition-all border-l-4 border-l-barmlo-blue">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                              <p className="text-sm font-medium text-gray-900">
@@ -407,12 +407,12 @@ async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId
                              </p>
                           </div>
                           <div className="text-right ml-4 flex items-center gap-3">
-                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-barmlo-blue/10 text-barmlo-blue">
                                DISPATCH
                              </span>
                              <Link
                                href={`/projects/${data.id}?tab=logistics`}
-                               className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                               className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-barmlo-blue hover:bg-barmlo-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-barmlo-blue"
                              >
                                Create Dispatch
                              </Link>

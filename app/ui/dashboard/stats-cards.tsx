@@ -73,7 +73,7 @@ export default function StatsCards({
           className="relative overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5 sm:px-6 sm:pt-6"
         >
           <dt>
-            <div className="absolute rounded-md bg-blue-500 p-3">
+            <div className="absolute rounded-md bg-barmlo-blue p-3">
               <item.icon className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
             <p className="ml-16 truncate text-sm font-medium text-gray-500">{item.name}</p>
