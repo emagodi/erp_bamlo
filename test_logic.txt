@@ -1,0 +1,44 @@
+🔍 Testing Project Page Logic...
+
+Test 1: Projects with no requisitions
+❌ Error testing project page logic: PrismaClientInitializationError: 
+Invalid `prisma.project.findMany()` invocation in
+C:\Users\ze9167867\Desktop\next\quotation\scripts\test-project-page-logic.ts:31:58
+
+  28 try {
+  29     // Test 1: Find a project with no requisitions
+  30     console.log('Test 1: Projects with no requisitions');
+→ 31     const projectsWithoutReqs = await prisma.project.findMany(
+Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 9)
+    at ei.handleRequestError (C:\Users\ze9167867\Desktop\next\quotation\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ze9167867\Desktop\next\quotation\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ze9167867\Desktop\next\quotation\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ze9167867\Desktop\next\quotation\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async testProjectPageLogic (C:\Users\ze9167867\Desktop\next\quotation\scripts\test-project-page-logic.ts:31:37) {
+  clientVersion: '6.16.2',
+  errorCode: undefined,
+  retryable: undefined
+}
+   Message: 
+Invalid `prisma.project.findMany()` invocation in
+C:\Users\ze9167867\Desktop\next\quotation\scripts\test-project-page-logic.ts:31:58
+
+  28 try {
+  29     // Test 1: Find a project with no requisitions
+  30     console.log('Test 1: Projects with no requisitions');
+→ 31     const projectsWithoutReqs = await prisma.project.findMany(
+Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 9)
+   Stack: PrismaClientInitializationError: 
+Invalid `prisma.project.findMany()` invocation in
+C:\Users\ze9167867\Desktop\next\quotation\scripts\test-project-page-logic.ts:31:58
+
+  28 try {
+  29     // Test 1: Find a project with no requisitions
+  30     console.log('Test 1: Projects with no requisitions');
+→ 31     const projectsWithoutReqs = await prisma.project.findMany(
+Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 9)
+    at ei.handleRequestError (C:\Users\ze9167867\Desktop\next\quotation\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ze9167867\Desktop\next\quotation\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ze9167867\Desktop\next\quotation\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ze9167867\Desktop\next\quotation\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async testProjectPageLogic (C:\Users\ze9167867\Desktop\next\quotation\scripts\test-project-page-logic.ts:31:37)

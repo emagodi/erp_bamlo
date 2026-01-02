@@ -1,0 +1,76 @@
+// app/(protected)/projects/[projectId]/requisitions/new/page.tsx
+import { getProjectQuoteLinesWithRemaining } from '@/app/lib/requisition';
+import { createRequisitionFromQuotePicks } from '@/app/(protected)/projects/actions'; // we'll write below
+import SubmitButton from '@/components/SubmitButton';
+
+export default async function NewRequisitionPage({
+  params,
+}: {
+  params: Promise<{ projectId: string }>;
+}) {
+  const { projectId } = await params;
+  const lines = await getProjectQuoteLinesWithRemaining(projectId);
+
+  console.log('Project ID:', projectId);
+  console.log('jhdsjhjdshjdsahhjashjashjsah');
+  console.log('Quote lines with remaining:', lines);
+
+  return (
+    <div className="p-6 space-y-4">
+      <h1 className="text-2xl font-semibold">Create Requisiti00000n</h1>
+
+      <form action={createRequisitionFromQuotePicks}>
+        <input type="hidden" name="projectId" value={projectId} />
+        <div className="overflow-x-auto rounded border bg-white">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-2 py-1">Include</th>
+                <th className="px-2 py-1 text-left">Description</th>
+                <th className="px-2 py-1">Unit</th>
+                <th className="px-2 py-1 text-right">Quote Qty</th>
+                <th className="px-2 py-1 text-right">Already Req.</th>
+                <th className="px-2 py-1 text-right">Qty to Request</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lines.map((l, idx) => (
+                <tr key={l.quoteLineId} className="border-b last:border-b-0">
+                  <td className="px-2 py-1 text-center">
+                    {l.remaining > 0 ? (
+                      <input type="checkbox" name={`pick-${idx}-include`} defaultChecked />
+                    ) : (
+                      <input type="checkbox" disabled />
+                    )}
+                    <input type="hidden" name={`pick-${idx}-quoteLineId`} value={l.quoteLineId} />
+                  </td>
+                  <td className="px-2 py-1">{l.description}</td>
+                  <td className="px-2 py-1 text-center">{l.unit}</td>
+                  <td className="px-2 py-1 text-right">{l.quoteQty}</td>
+                  <td className="px-2 py-1 text-right">{l.alreadyRequested}</td>
+                  <td className="px-2 py-1 text-right">
+                    <input
+                      type="number"
+                      min={0}
+                      max={l.remaining}
+                      defaultValue={l.remaining}
+                      name={`pick-${idx}-qty`}
+                      className="w-24 rounded border px-2 py-1 text-right"
+                      disabled={l.remaining === 0}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-4">
+          <SubmitButton className="rounded bg-slate-900 px-4 py-2 text-white">
+            Create Requisition
+          </SubmitButton>
+        </div>
+      </form>
+    </div>
+  );
+}

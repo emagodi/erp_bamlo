@@ -1,0 +1,923 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("POSTGRES_POSTGRES_PRISMA_URL")
+  directUrl         = env("MIGRATIONS_OVER_POOLER_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id                             String                   @id @default(cuid())
+  name                           String?
+  email                          String                   @unique
+  role                           String                   @default("QS")
+  office                         String?
+  createdAt                      DateTime                 @default(now())
+  passwordHash                   String?
+  managerId                      String?
+  dispatchesCreated              Dispatch[]               @relation("DispatchCreatedBy")
+  dispatchesSecurity             Dispatch[]               @relation("DispatchSecurity")
+  dispatchesAssigned             Dispatch[]               @relation("DispatchAssignedToDriver")
+  employee                       Employee?
+  approvedFundingRequests        FundingRequest[]         @relation("FundingApprovedBy")
+  decidedFundingRequests         FundingRequest[]         @relation("FundingDecidedBy")
+  fundingRequests                FundingRequest[]         @relation("FundingRequestedBy")
+  submittedFundingRequests       FundingRequest[]         @relation("FundingSubmittedBy")
+  grnsReceived                   GoodsReceivedNote[]      @relation("GRNReceivedBy")
+  grnsVerified                   GoodsReceivedNote[]      @relation("GRNVerifiedBy")
+  inventoryMoves                 InventoryMove[]
+  inventoryReturns               InventoryReturn[]
+  notifications                  Notification[]
+  paymentsReceived               Payment[]                @relation("PaymentReceivedBy")
+  requisitionReviewSubmissions   ProcurementRequisition[] @relation("RequisitionReviewSubmittedBy")
+  requisitionsSubmitted          ProcurementRequisition[] @relation("RequisitionSubmittedBy")
+  projectsAssigned               Project[]                @relation("ProjectAssignedTo")
+  projectsCreated                Project[]                @relation("ProjectCreatedBy")
+  ProjectMember                  ProjectMember[]
+  ProjectTask                    ProjectTask[]
+  projectTasksCreated            ProjectTask[]            @relation("TaskCreator")
+  projectTasksAssigned           ProjectTask[]            @relation("TaskAssignee")
+  purchaseOrdersCreated          PurchaseOrder[]          @relation("PurchaseOrdersCreated")
+  purchaseOrdersDecided          PurchaseOrder[]          @relation("PurchaseOrdersDecided")
+  createdQuotes                  Quote[]                  @relation("CreatedBy")
+  projectManagerQuotes           Quote[]                  @relation("QuoteProjectManager")
+  reviewedQuotes                 Quote[]                  @relation("Reviewer")
+  salesQuotes                    Quote[]                  @relation("Sales")
+  quoteLineExtraDecisions        QuoteLineExtraRequest[]  @relation("QuoteLineExtraDecidedBy")
+  quoteLineExtraRequests         QuoteLineExtraRequest[]  @relation("QuoteLineExtraRequestedBy")
+  negotiations                   QuoteNegotiation[]
+  reviewedNegotiationItems       QuoteNegotiationItem[]   @relation("NegotiationItemReviewer")
+  requisitionItemTopupsDecided   RequisitionItemTopup[]   @relation("RequisitionItemTopupDecidedBy")
+  requisitionItemTopupsRequested RequisitionItemTopup[]   @relation("RequisitionItemTopupRequestedBy")
+  schedulesCreated               Schedule[]               @relation("ScheduleCreatedBy")
+  scheduleReports                ScheduleTaskReport[]     @relation("ScheduleTaskReportReporter")
+  taskAssignments                TaskAssignment[]
+  taskProgresses                 TaskProgress[]
+  manager                        User?                    @relation("UserToManager", fields: [managerId], references: [id])
+  team                           User[]                   @relation("UserToManager")
+  actionLogs                     UserActionLog[]
+}
+
+model Customer {
+  id          String  @id @default(cuid())
+  displayName String
+  email       String?
+  phone       String?
+  addressJson Json?   @map("addressJson")
+  city        String?
+  quotes      Quote[]
+
+  @@unique([displayName, city])
+}
+
+model Product {
+  id             String      @id @default(cuid())
+  sku            String      @unique
+  name           String
+  unit           String?
+  basePriceMinor BigInt
+  extraJson      String?
+  quoteLines     QuoteLine[]
+}
+
+model FormulaRule {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  description String?
+  expression  String
+  dependsOn   String?
+}
+
+model Quote {
+  id                       String             @id @default(cuid())
+  number                   String?            @unique
+  customerId               String
+  currency                 String             @default("USD")
+  vatBps                   Int
+  discountPolicy           String?
+  metaJson                 String?
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
+  status                   String             @default("DRAFT")
+  office                   String?
+  createdById              String
+  reviewerId               String?
+  salesId                  String?
+  projectManagerId         String?
+  projectManagerAssignedAt DateTime?
+  negotiationCycle         Int                @default(0)
+  project                  Project?
+  projectTasks             ProjectTask[]
+  createdBy                User               @relation("CreatedBy", fields: [createdById], references: [id])
+  customer                 Customer           @relation(fields: [customerId], references: [id])
+  projectManager           User?              @relation("QuoteProjectManager", fields: [projectManagerId], references: [id])
+  reviewer                 User?              @relation("Reviewer", fields: [reviewerId], references: [id])
+  sales                    User?              @relation("Sales", fields: [salesId], references: [id])
+  lines                    QuoteLine[]
+  negotiations             QuoteNegotiation[]
+  versions                 QuoteVersion[]
+}
+
+model QuoteLine {
+  id                String                       @id @default(cuid())
+  quoteId           String
+  productId         String?
+  description       String
+  quantity          Float
+  unit              String?
+  unitPriceMinor    BigInt
+  lineSubtotalMinor BigInt
+  lineDiscountMinor BigInt
+  lineTaxMinor      BigInt
+  lineTotalMinor    BigInt
+  metaJson          String?
+  source            String?                      @default("System")
+  cycle             Int                          @default(0)
+  addedInVersionId  String?
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
+  procurementItems  ProcurementRequisitionItem[]
+  PurchaseOrderItem PurchaseOrderItem[]
+  addedInVersion    QuoteVersion?                @relation("QuoteVersionAddedLines", fields: [addedInVersionId], references: [id])
+  product           Product?                     @relation(fields: [productId], references: [id])
+  quote             Quote                        @relation(fields: [quoteId], references: [id])
+  extraRequests     QuoteLineExtraRequest[]
+  negotiationItems  QuoteNegotiationItem[]
+  scheduleItems     ScheduleItem[]
+}
+
+model QuoteVersion {
+  id           String             @id @default(cuid())
+  quoteId      String
+  version      Int
+  snapshotJson String
+  createdAt    DateTime           @default(now())
+  label        String?
+  status       String?
+  byRole       String?
+  addedLines   QuoteLine[]        @relation("QuoteVersionAddedLines")
+  origOf       QuoteNegotiation[] @relation("OrigVersion")
+  propOf       QuoteNegotiation[] @relation("PropVersion")
+  quote        Quote              @relation(fields: [quoteId], references: [id])
+}
+
+model ProjectTask {
+  id             String           @id @default(cuid())
+  projectId      String
+  title          String
+  description    String?
+  plannedStart   DateTime?
+  plannedEnd     DateTime?
+  estimatedHours Float            @default(8)
+  status         String           @default("PENDING")
+  assigneeId     String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userId         String?
+  createdById    String?
+  quoteId        String?
+  assignee       User?            @relation(fields: [assigneeId], references: [id])
+  createdBy      User?            @relation("TaskCreator", fields: [createdById], references: [id])
+  project        Project          @relation(fields: [projectId], references: [id])
+  Quote          Quote?           @relation(fields: [quoteId], references: [id])
+  User           User?            @relation("TaskAssignee", fields: [userId], references: [id])
+  assignments    TaskAssignment[]
+  progress       TaskProgress[]
+}
+
+model QuoteNegotiation {
+  id                String                 @id @default(cuid())
+  quoteId           String
+  originalVersionId String
+  proposedVersionId String
+  status            String                 @default("OPEN")
+  createdById       String
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  createdBy         User                   @relation(fields: [createdById], references: [id])
+  originalVersion   QuoteVersion           @relation("OrigVersion", fields: [originalVersionId], references: [id])
+  proposedVersion   QuoteVersion           @relation("PropVersion", fields: [proposedVersionId], references: [id])
+  quote             Quote                  @relation(fields: [quoteId], references: [id])
+  items             QuoteNegotiationItem[]
+}
+
+model QuoteNegotiationItem {
+  id                 String           @id @default(cuid())
+  negotiationId      String
+  quoteLineId        String
+  proposedTotalMinor BigInt
+  status             LineDecision     @default(PENDING)
+  reviewedById       String?
+  reviewedAt         DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  negotiation        QuoteNegotiation @relation(fields: [negotiationId], references: [id])
+  quoteLine          QuoteLine        @relation(fields: [quoteLineId], references: [id])
+  reviewedBy         User?            @relation("NegotiationItemReviewer", fields: [reviewedById], references: [id])
+}
+
+model Project {
+  id                     String                      @id @default(cuid())
+  quoteId                String                      @unique
+  commenceOn             DateTime
+  installmentDueOn       DateTime
+  depositMinor           BigInt                      @default(0)
+  installmentMinor       BigInt                      @default(0)
+  installmentDueDay      Int                         @default(1)
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+  createdById            String?
+  office                 String?
+  status                 ProjectStatus               @default(CREATED)
+  name                   String                      @default("")
+  assignedToId           String?
+  projectNumber          String?                     @unique
+  clientPayments         ClientPayment[]
+  dispatches             Dispatch[]
+  inventoryAllocations   InventoryAllocation[]
+  payments               Payment[]
+  paymentSchedules       PaymentSchedule[]
+  requisitions           ProcurementRequisition[]
+  assignedTo             User?                       @relation("ProjectAssignedTo", fields: [assignedToId], references: [id])
+  createdBy              User?                       @relation("ProjectCreatedBy", fields: [createdById], references: [id])
+  quote                  Quote                       @relation(fields: [quoteId], references: [id])
+  ProjectMember          ProjectMember[]
+  productivitySettings   ProjectProductivitySetting?
+  ProjectTask            ProjectTask[]
+  PurchaseOrder          PurchaseOrder[]
+  quoteLineExtraRequests QuoteLineExtraRequest[]
+  schedules              Schedule?
+  StockMove              StockMove[]
+  tasks                  Task[]
+
+  @@index([projectNumber])
+}
+
+model ProcurementRequisition {
+  id                  String                       @id @default(cuid())
+  projectId           String
+  status              String                       @default("DRAFT")
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  submittedById       String?
+  note                String?
+  reviewSubmittedAt   DateTime?
+  reviewSubmittedById String?
+  funding             FundingRequest[]
+  project             Project                      @relation(fields: [projectId], references: [id])
+  reviewSubmittedBy   User?                        @relation("RequisitionReviewSubmittedBy", fields: [reviewSubmittedById], references: [id])
+  submittedBy         User?                        @relation("RequisitionSubmittedBy", fields: [submittedById], references: [id])
+  items               ProcurementRequisitionItem[]
+  purchases           Purchase[]
+  PurchaseOrder       PurchaseOrder[]
+}
+
+model ProcurementRequisitionItem {
+  id                      String                 @id @default(cuid())
+  requisitionId           String
+  description             String
+  qty                     Float?
+  unit                    String?
+  estPriceMinor           BigInt                 @default(0)
+  quoteLineId             String?
+  qtyRequested            Float                  @default(0)
+  amountMinor             BigInt                 @default(0)
+  extraRequestedQty       Float?                 @default(0)
+  reviewRequested         Boolean                @default(false)
+  reviewApproved          Boolean                @default(false)
+  requestedUnitPriceMinor BigInt?
+  dispatchItems           DispatchItem[]
+  quoteLine               QuoteLine?             @relation(fields: [quoteLineId], references: [id])
+  requisition             ProcurementRequisition @relation(fields: [requisitionId], references: [id])
+  purchases               Purchase[]
+  poItems                 PurchaseOrderItem[]
+  topups                  RequisitionItemTopup[]
+}
+
+model RequisitionItemTopup {
+  id                String                     @id @default(cuid())
+  requisitionItemId String
+  requestedById     String?
+  decidedById       String?
+  qtyRequested      Float
+  reason            String?
+  approved          Boolean                    @default(false)
+  decidedAt         DateTime?
+  createdAt         DateTime                   @default(now())
+  decidedBy         User?                      @relation("RequisitionItemTopupDecidedBy", fields: [decidedById], references: [id])
+  requestedBy       User?                      @relation("RequisitionItemTopupRequestedBy", fields: [requestedById], references: [id])
+  requisitionItem   ProcurementRequisitionItem @relation(fields: [requisitionItemId], references: [id])
+}
+
+model QuoteLineExtraRequest {
+  id            String    @id @default(cuid())
+  projectId     String
+  quoteLineId   String
+  qty           Float
+  reason        String?
+  status        String    @default("PENDING")
+  requiresAdmin Boolean   @default(false)
+  requestedById String
+  decidedById   String?
+  decidedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  decidedBy     User?     @relation("QuoteLineExtraDecidedBy", fields: [decidedById], references: [id])
+  project       Project   @relation(fields: [projectId], references: [id])
+  quoteLine     QuoteLine @relation(fields: [quoteLineId], references: [id])
+  requestedBy   User      @relation("QuoteLineExtraRequestedBy", fields: [requestedById], references: [id])
+
+  @@index([projectId])
+  @@index([quoteLineId])
+  @@index([status])
+}
+
+model FundingRequest {
+  id             String                 @id @default(cuid())
+  requisitionId  String
+  amountMinor    BigInt
+  status         String                 @default("PENDING")
+  approvedAt     DateTime?
+  lastReminderAt DateTime?
+  rejectedAt     DateTime?
+  reminderCount  Int                    @default(0)
+  requestedAt    DateTime               @default(now())
+  requestedById  String?
+  decidedById    String?
+  decidedAt      DateTime?
+  reason         String?
+  isTopUp        Boolean                @default(false)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime?              @updatedAt
+  approvedById   String?
+  submittedById  String?
+  type           FundingRequestType     @default(BASE)
+  note           String?
+  disbursements  FundDisbursement[]
+  approvedBy     User?                  @relation("FundingApprovedBy", fields: [approvedById], references: [id])
+  decidedBy      User?                  @relation("FundingDecidedBy", fields: [decidedById], references: [id])
+  requestedBy    User?                  @relation("FundingRequestedBy", fields: [requestedById], references: [id])
+  requisition    ProcurementRequisition @relation(fields: [requisitionId], references: [id])
+  submittedBy    User?                  @relation("FundingSubmittedBy", fields: [submittedById], references: [id])
+
+  @@index([requisitionId])
+  @@index([status])
+  @@index([type])
+}
+
+model FundDisbursement {
+  id               String         @id @default(cuid())
+  fundingRequestId String
+  amountMinor      BigInt
+  paidAt           DateTime
+  ref              String?
+  attachmentUrl    String?
+  createdAt        DateTime       @default(now())
+  fundingRequest   FundingRequest @relation(fields: [fundingRequestId], references: [id])
+
+  @@index([fundingRequestId])
+}
+
+model Purchase {
+  id                String                      @id @default(cuid())
+  requisitionId     String
+  status            String                      @default("PENDING") // PENDING | PO_CREATED
+  purchaseOrderId   String?
+  purchasedAt       DateTime                    @default(now())
+  attachmentsJson   String?
+  filedAt           DateTime?
+  requisitionItemId String?
+  vendor            String
+  taxInvoiceNo      String
+  priceMinor        BigInt                      @default(0)
+  qty               Float                       @default(0)
+  purchasedOn       DateTime?
+  invoiceUrl        String?
+  createdById       String?
+  createdAt         DateTime                    @default(now())
+  vendorPhone       String?
+  dispatchItems     DispatchItem[]
+  requisition       ProcurementRequisition      @relation(fields: [requisitionId], references: [id])
+  requisitionItem   ProcurementRequisitionItem? @relation(fields: [requisitionItemId], references: [id])
+  purchaseOrder     PurchaseOrder?              @relation(fields: [purchaseOrderId], references: [id])
+}
+
+model Dispatch {
+  id                   String            @id @default(cuid())
+  projectId            String
+  status               String            @default("DRAFT")
+  createdAt            DateTime          @default(now())
+  attachmentsJson      String?
+  createdById          String?
+  note                 String?
+  securityById         String?
+  driverById           String?
+  driverName           String?
+  signedBy             String?
+  vehicleReg           String?
+  driverSignedAt       DateTime?
+  securitySignedAt     DateTime?
+  siteStockistSignedAt DateTime?
+  departAt             DateTime?
+  receiveAt            DateTime?
+  securityAck          String?
+  driverAck            String?
+  siteAck              String?
+  createdBy            User?             @relation("DispatchCreatedBy", fields: [createdById], references: [id])
+  project              Project           @relation(fields: [projectId], references: [id])
+  assignedToDriverId String?
+  assignedToDriver     User?             @relation("DispatchAssignedToDriver", fields: [assignedToDriverId], references: [id])
+  securityBy           User?             @relation("DispatchSecurity", fields: [securityById], references: [id])
+  items                DispatchItem[]
+  inventoryReturns     InventoryReturn[]
+}
+
+model DispatchItem {
+  id                   String                      @id @default(cuid())
+  dispatchId           String
+  description          String
+  qty                  Float
+  unit                 String?
+  purchaseId           String?
+  requisitionItemId    String?
+  estPriceMinor        BigInt?
+  handedOutAt          DateTime?
+  handedOutById        String?
+  receivedAt           DateTime?
+  receivedByName       String?
+  receivedById         String?
+  inventoryItemId      String?
+  selected             Boolean                     @default(true)
+  returnedQty          Float?                      @default(0)
+  usedOut              Boolean                     @default(false)
+  usedOutAt            DateTime?
+  usedOutById          String?
+  handedOutQty         Float                       @default(0)
+  usedOutQty           Float                       @default(0)
+  dispatch             Dispatch                    @relation(fields: [dispatchId], references: [id])
+  inventoryItem        InventoryItem?              @relation(fields: [inventoryItemId], references: [id])
+  purchase             Purchase?                   @relation(fields: [purchaseId], references: [id])
+  requisitionItem      ProcurementRequisitionItem? @relation(fields: [requisitionItemId], references: [id])
+  inventoryReturnItems InventoryReturnItem[]
+}
+
+model InventoryMove {
+  id              String        @id @default(cuid())
+  inventoryItemId String
+  changeById      String?
+  delta           Float
+  reason          String
+  metaJson        String?
+  createdAt       DateTime      @default(now())
+  changeBy        User?         @relation(fields: [changeById], references: [id])
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
+}
+
+model InventoryAllocation {
+  id              String        @id @default(cuid())
+  inventoryItemId String
+  projectId       String
+  qty             Float
+  dispatchedAt    DateTime      @default(now())
+  returnedAt      DateTime?
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  project         Project       @relation(fields: [projectId], references: [id])
+}
+
+model Payment {
+  id           String   @id @default(cuid())
+  projectId    String
+  type         String
+  amountMinor  BigInt
+  receivedAt   DateTime
+  receivedById String?
+  receiptNo    String?
+  createdAt    DateTime @default(now())
+  paidOn       DateTime
+  ref          String?
+  createdById  String?
+  project      Project  @relation(fields: [projectId], references: [id])
+  receivedBy   User?    @relation("PaymentReceivedBy", fields: [receivedById], references: [id])
+}
+
+model Reminder {
+  id          String   @id @default(cuid())
+  relatedType String
+  relatedId   String
+  attempt     Int
+  sentAt      DateTime @default(now())
+  status      String
+}
+
+model Escalation {
+  id          String   @id @default(cuid())
+  relatedType String
+  relatedId   String
+  triggeredAt DateTime @default(now())
+  message     String
+}
+
+model ClientPayment {
+  id            String   @id @default(cuid())
+  projectId     String
+  type          String
+  amountMinor   BigInt
+  receivedAt    DateTime
+  receiptNo     String?
+  method        String?
+  attachmentUrl String?
+  recordedById  String
+  createdAt     DateTime @default(now())
+  project       Project  @relation(fields: [projectId], references: [id])
+}
+
+model PaymentSchedule {
+  id          String                @id @default(cuid())
+  projectId   String
+  label       String
+  seq         Int
+  dueOn       DateTime
+  amountMinor BigInt
+  paidMinor   BigInt                @default(0)
+  status      PaymentScheduleStatus @default(DUE)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  reminders   PaymentReminder[]
+  project     Project               @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, seq])
+}
+
+model PaymentReminder {
+  id         String          @id @default(cuid())
+  scheduleId String
+  kind       String
+  sentAt     DateTime        @default(now())
+  schedule   PaymentSchedule @relation(fields: [scheduleId], references: [id])
+}
+
+/// schedule models
+model Schedule {
+  id          String         @id @default(cuid())
+  projectId   String         @unique
+  createdById String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  status      String         @default("DRAFT")
+  note        String?
+  createdBy   User?          @relation("ScheduleCreatedBy", fields: [createdById], references: [id])
+  project     Project        @relation(fields: [projectId], references: [id])
+  items       ScheduleItem[]
+
+  @@index([projectId])
+}
+
+model ProjectProductivitySetting {
+  id                  String  @id @default(cuid())
+  projectId           String  @unique
+  builderShare        Float   @default(0.3333)
+  excavationBuilder   Float   @default(5)
+  excavationAssistant Float   @default(5)
+  brickBuilder        Float   @default(500)
+  brickAssistant      Float   @default(500)
+  plasterBuilder      Float   @default(16)
+  plasterAssistant    Float   @default(16)
+  cubicBuilder        Float   @default(5)
+  cubicAssistant      Float   @default(5)
+  project             Project @relation(fields: [projectId], references: [id])
+}
+
+model ScheduleTaskReport {
+  id              String       @id @default(cuid())
+  scheduleItemId  String
+  reporterId      String?
+  reportedForDate DateTime     @default(now())
+  activity        String?
+  usedQty         Float?
+  usedUnit        String?
+  remainingQty    Float?
+  remainingUnit   String?
+  status          String       @default("ACTIVE")
+  createdAt       DateTime     @default(now())
+  reporter        User?        @relation("ScheduleTaskReportReporter", fields: [reporterId], references: [id])
+  scheduleItem    ScheduleItem @relation(fields: [scheduleItemId], references: [id])
+
+  @@index([scheduleItemId])
+  @@index([reporterId])
+  @@index([reportedForDate])
+}
+
+model ScheduleItem {
+  id           String               @id @default(cuid())
+  scheduleId   String
+  quoteLineId  String?
+  title        String
+  description  String?
+  unit         String?
+  quantity     Float?
+  plannedStart DateTime?
+  plannedEnd   DateTime?
+  employees    Int?
+  estHours     Float?
+  note         String?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  status       String               @default("ACTIVE")
+  quoteLine    QuoteLine?           @relation(fields: [quoteLineId], references: [id])
+  schedule     Schedule             @relation(fields: [scheduleId], references: [id])
+  reports      ScheduleTaskReport[]
+  assignees    Employee[]           @relation("ScheduleItemAssignees")
+
+  @@index([scheduleId])
+  @@index([quoteLineId])
+}
+
+model Employee {
+  id            String         @id @default(cuid())
+  userId        String?        @unique
+  givenName     String
+  surname       String?
+  ecNumber      String?        @unique
+  role          String
+  phone         String?
+  email         String?        @unique
+  createdBy     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  office        String?
+  user          User?          @relation(fields: [userId], references: [id])
+  scheduleItems ScheduleItem[] @relation("ScheduleItemAssignees")
+}
+
+model TaskTemplate {
+  key              String   @id
+  name             String
+  hoursPerUnit     Float
+  unitLabel        String
+  complexityFactor Float    @default(1.0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  tasks            Task[]
+}
+
+model Task {
+  id              String           @id @default(cuid())
+  projectId       String
+  templateKey     String?
+  title           String
+  description     String?
+  quantity        Float?
+  estimatedHours  Float            @default(8)
+  plannedStart    DateTime?
+  plannedEnd      DateTime?
+  status          String           @default("PENDING")
+  percentComplete Int              @default(0)
+  createdById     String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  project         Project          @relation(fields: [projectId], references: [id])
+  template        TaskTemplate?    @relation(fields: [templateKey], references: [key])
+  assignments     TaskAssignment[]
+  progressLogs    TaskProgress[]
+}
+
+model TaskAssignment {
+  id            String       @id @default(cuid())
+  taskId        String
+  userId        String
+  hoursPerDay   Float        @default(8)
+  roleLabel     String?
+  createdAt     DateTime     @default(now())
+  projectTaskId String?
+  ProjectTask   ProjectTask? @relation(fields: [projectTaskId], references: [id])
+  task          Task         @relation(fields: [taskId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+
+  @@unique([taskId, userId])
+}
+
+model TaskProgress {
+  id            String       @id @default(cuid())
+  taskId        String
+  userId        String
+  percent       Int
+  note          String?
+  loggedAt      DateTime     @default(now())
+  projectTaskId String?
+  ProjectTask   ProjectTask? @relation(fields: [projectTaskId], references: [id])
+  task          Task         @relation(fields: [taskId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  kind      String
+  message   String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model ProjectMember {
+  id        String  @id @default(cuid())
+  projectId String
+  userId    String
+  role      String
+  project   Project @relation(fields: [projectId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+}
+
+/// Purchase Order (created from a requisition)
+model PurchaseOrder {
+  id                 String                  @id @default(cuid())
+  projectId          String
+  requisitionId      String?
+  status             String                  @default("DRAFT")
+  vendor             String?
+  supplierId         String?
+  note               String?
+  requestedMinor     BigInt                  @default(0)
+  totalMinor         BigInt                  @default(0)
+  approvedMinor      BigInt                  @default(0)
+  createdById        String?
+  decidedById        String?
+  decidedAt          DateTime?
+  reason             String?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  goodsReceivedNotes GoodsReceivedNote[]
+  purchases          Purchase[]
+  createdBy          User?                   @relation("PurchaseOrdersCreated", fields: [createdById], references: [id])
+  decidedBy          User?                   @relation("PurchaseOrdersDecided", fields: [decidedById], references: [id])
+  project            Project                 @relation(fields: [projectId], references: [id])
+  requisition        ProcurementRequisition? @relation(fields: [requisitionId], references: [id])
+  items              PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+  id                String                      @id @default(cuid())
+  purchaseOrderId   String
+  requisitionItemId String?
+  quoteLineId       String?
+  description       String
+  unit              String?
+  qty               Float                       @default(0)
+  unitPriceMinor    BigInt                      @default(0)
+  totalMinor        BigInt                      @default(0)
+  grnItems          GoodsReceivedNoteItem[]
+  purchaseOrder     PurchaseOrder               @relation(fields: [purchaseOrderId], references: [id])
+  quoteLine         QuoteLine?                  @relation(fields: [quoteLineId], references: [id])
+  requisitionItem   ProcurementRequisitionItem? @relation(fields: [requisitionItemId], references: [id])
+}
+
+model GoodsReceivedNote {
+  id              String                  @id @default(cuid())
+  purchaseOrderId String
+  receivedById    String?
+  verifiedById    String?
+  receivedAt      DateTime?
+  verifiedAt      DateTime?
+  status          String                  @default("PENDING")
+  note            String?
+  vendorName      String?
+  receiptNumber   String?
+  vendorPhone     String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  purchaseOrder   PurchaseOrder           @relation(fields: [purchaseOrderId], references: [id])
+  receivedBy      User?                   @relation("GRNReceivedBy", fields: [receivedById], references: [id])
+  verifiedBy      User?                   @relation("GRNVerifiedBy", fields: [verifiedById], references: [id])
+  items           GoodsReceivedNoteItem[]
+}
+
+model GoodsReceivedNoteItem {
+  id           String             @id @default(cuid())
+  grnId        String
+  poItemId     String?
+  description  String
+  unit         String?
+  qtyDelivered Float              @default(0)
+  qtyAccepted  Float              @default(0)
+  qtyRejected  Float              @default(0)
+  priceMinor   BigInt?
+  varianceMinor BigInt?           @default(0)
+  grn          GoodsReceivedNote  @relation(fields: [grnId], references: [id])
+  poItem       PurchaseOrderItem? @relation(fields: [poItemId], references: [id])
+}
+
+/// Global inventory
+model InventoryItem {
+  id                   String                @id @default(cuid())
+  key                  String                @unique
+  description          String
+  unit                 String?
+  quantity             Float                 @default(0)
+  name                 String?
+  qty                  Float                 @default(0)
+  category             String?
+  purchaseId           String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  dispatchItems        DispatchItem[]
+  inventoryAllocations InventoryAllocation[]
+  inventoryMoves       InventoryMove[]
+  inventoryReturnItems InventoryReturnItem[]
+  moves                StockMove[]
+
+  @@unique([name, unit])
+}
+
+/// Inventory returns (items coming back from dispatches)
+model InventoryReturn {
+  id          String                @id @default(cuid())
+  dispatchId  String?
+  projectId   String?
+  createdById String?
+  note        String?
+  createdAt   DateTime              @default(now())
+  createdBy   User?                 @relation(fields: [createdById], references: [id])
+  dispatch    Dispatch?             @relation(fields: [dispatchId], references: [id])
+  items       InventoryReturnItem[]
+}
+
+model InventoryReturnItem {
+  id              String          @id @default(cuid())
+  returnId        String
+  dispatchItemId  String?
+  inventoryItemId String?
+  description     String
+  qty             Float
+  unit            String?
+  note            String?
+  createdAt       DateTime        @default(now())
+  dispatchItem    DispatchItem?   @relation(fields: [dispatchItemId], references: [id])
+  inventoryItem   InventoryItem?  @relation(fields: [inventoryItemId], references: [id])
+  inventoryReturn InventoryReturn @relation(fields: [returnId], references: [id])
+}
+
+model StockMove {
+  id              String        @id @default(cuid())
+  inventoryItemId String
+  projectId       String?
+  kind            String
+  qty             Float
+  refType         String
+  refId           String
+  createdAt       DateTime      @default(now())
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  project         Project?      @relation(fields: [projectId], references: [id])
+}
+
+model UserActionLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  method    String
+  path      String
+  ip        String?
+  userAgent String?
+  details   String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+enum FundingRequestType {
+  BASE
+  TOP_UP
+}
+
+enum LineDecision {
+  PENDING
+  OK
+  ACCEPTED
+  REJECTED
+  REVIEWED
+}
+
+enum ProjectStatus {
+  PLANNED
+  PREPARING
+  READY
+  ONGOING
+  ON_HOLD
+  COMPLETED
+  CLOSED
+  DEPOSIT_PENDING
+  SCHEDULING_PENDING
+  CREATED
+}
+
+enum PaymentScheduleStatus {
+  DUE
+  PARTIAL
+  PAID
+  OVERDUE
+  CANCELLED
+}

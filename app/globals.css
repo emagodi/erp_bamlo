@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, :root {
+  height: 100%;
+}
+
+/* Base theme colors */
+@layer base {
+  body {
+    @apply bg-gray-100 text-gray-900;
+  }
+  .dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+/* Hide scrollbars utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Custom thin vertical scrollbar */
+.scrollbar-y {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
+}
+.scrollbar-y::-webkit-scrollbar {
+  width: 10px;
+}
+.scrollbar-y::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.35);
+  border-radius: 999px;
+}
+.scrollbar-y::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media print {
+  /* Hide sidebar, header, and buttons */
+  aside, header, button, .no-print {
+    display: none !important;
+  }
+
+  /* Ensure content takes full width */
+  main, div[class*="flex-1"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Reset background colors for printing */
+  body, .bg-gray-50, .bg-gray-100 {
+    background-color: white !important;
+  }
+
+  /* Ensure text is black */
+  body {
+    color: black !important;
+  }
+
+  /* Hide scrollbars */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}

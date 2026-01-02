@@ -1,0 +1,14 @@
+--- Verifying Deposit Locking Logic ---
+Scanning 3 projects...
+
+[BM20251222001] Kudakwashe Exstaff Koti -> LOCKED 🔒
+   Reason: Status: CREATED AND Deposit: 0/4000 (PARTIAL/UNPAID)
+[BM20251225001] Kudakwashe Exstaff Koti -> LOCKED 🔒
+   Reason: Status: DEPOSIT_PENDING AND Deposit: 1300/13000 (PARTIAL/UNPAID)
+[BM20251224001] Kundai Chitima       -> LOCKED 🔒
+   Reason: Status: DEPOSIT_PENDING AND Deposit: 1000/10000 (PARTIAL/UNPAID)
+
+--- Summary ---
+Locked (Partial/Unpaid Deposit): 3
+Unlocked (Fully Paid or Other Status): 0
+Already Scheduled (Skipped): 0

@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bamlo_app
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    # environment:
+    #   - DATABASE_URL=postgresql://bamlo:bamlo_password@db:5432/bamlo
+    #   - POSTGRES_POSTGRES_PRISMA_URL=postgresql://bamlo:bamlo_password@db:5432/bamlo
+    #   - MIGRATIONS_OVER_POOLER_URL=postgresql://bamlo:bamlo_password@db:5432/bamlo
+    #   - SHADOW_DATABASE_URL=postgresql://bamlo:bamlo_password@db:5432/bamlo_shadow
+    #   - NEXT_PUBLIC_CURRENCY=USD
+    #   - VAT_DEFAULT=0.1500
+    #   - PDF_ENGINE=puppeteer
+    #   - NEXTAUTH_SECRET=super_secret_change_me_in_production
+    #   # - NEXTAUTH_URL=http://localhost:3000 # Uncomment if needed
+    # depends_on:
+    #   - db
+    networks:
+      - bamlo_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: bamlo_db
+    restart: always
+    environment:
+      - POSTGRES_USER=bamlo
+      - POSTGRES_PASSWORD=bamlo_password
+      - POSTGRES_DB=bamlo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bamlo_network
+
+networks:
+  bamlo_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

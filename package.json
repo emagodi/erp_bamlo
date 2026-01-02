@@ -1,0 +1,63 @@
+{
+  "name": "quotation",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "db:migrate": "prisma migrate deploy",
+    "start": "next start",
+    "lint": "eslint .",
+    "seed": "node prisma/seed.cjs",
+    "test": "vitest run",
+    "test:ui": "vitest",
+    "e2e": "playwright test"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.cjs"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@prisma/client": "^6.18.0",
+    "@react-pdf/renderer": "^3.4.4",
+    "@sparticuz/chromium": "^138.0.2",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "clsx": "2.1.1",
+    "date-fns": "^4.1.0",
+    "decimal.js": "^10.6.0",
+    "decimal.js-light": "2.5.1",
+    "expr-eval": "2.0.2",
+    "framer-motion": "^12.23.24",
+    "next": "15.0.7",
+    "next-auth": "^5.0.0-beta.29",
+    "puppeteer-core": "^24.22.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "recharts": "^3.5.0",
+    "sonner": "^2.0.7",
+    "xlsx": "0.18.5",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.47.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/multer": "1.4.11",
+    "@types/node": "^20.14.10",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "10.4.20",
+    "eslint": "8.57.0",
+    "eslint-config-next": "15.0.0",
+    "multer": "1.4.5-lts.1",
+    "postcss": "8.4.41",
+    "prettier": "3.3.3",
+    "prisma": "^6.16.2",
+    "tailwind-merge": "^1.14.0",
+    "tailwindcss": "3.4.10",
+    "ts-node": "10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.5.4",
+    "vitest": "2.0.5"
+  }
+}
