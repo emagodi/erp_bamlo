@@ -67,10 +67,13 @@ const parseVatEnvToPercent = (raw: string | undefined) => {
 };
 
 export async function createQuote(input: unknown, currentUserId?: string) {
-  const parsed = CreateQuoteSchema.parse(input);
-  if (!parsed.customerId) {
-    throw new Error('Customer is required: please select or create a customer before saving.');
-  }
+  try {
+    console.log('createQuote input:', JSON.stringify(input, null, 2));
+    const parsed = CreateQuoteSchema.parse(input);
+    console.log('createQuote parsed:', JSON.stringify(parsed, null, 2));
+    if (!parsed.customerId) {
+      throw new Error('Customer is required: please select or create a customer before saving.');
+    }
 
   const actingUser = currentUserId
     ? await prisma.user.findUnique({ where: { id: currentUserId }, select: { id: true, role: true, office: true } })
@@ -148,6 +151,10 @@ export async function createQuote(input: unknown, currentUserId?: string) {
   }, TX_OPTS);
 
   return { quoteId: created.id };
+  } catch (error) {
+    console.error('Error creating quote:', error);
+    throw error;
+  }
 }
 
 export async function createAutoQuote(input: {

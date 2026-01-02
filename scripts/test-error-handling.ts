@@ -1,4 +1,4 @@
-import { createQuote, createAutoQuote, transitionQuoteStatus, finalizeQuote } from '@/app/actionss';
+import { createQuote, createAutoQuote, transitionQuoteStatus, finalizeQuote } from '@/app/(protected)/actions';
 import { safeAction } from '@/lib/safe-action';
 import { z } from 'zod';
 

@@ -49,35 +49,46 @@ export default function WorksheetQuoteBuilder() {
   }
 
   async function onCreate() {
+    setError(null);
     start(async () => {
-      const { customerId } = await upsertCustomer({
-        displayName: customer.name || 'Walk-in Customer',
-        city: customer.city || null,
-        email: customer.email || null,
-        phone: customer.phone || null,
-        addressJson: customerAddress ? JSON.stringify({ line1: customerAddress }) : null,
-      });
-      const lines: any[] = [];
-      for (const sec of WORKSHEET_SECTIONS) {
-        for (const it of sec.items) {
-          const s = rows[it.id];
-          if (!s || !s.qty) continue;
-          lines.push({
-            description: it.description,
-            quantity: s.qty,
-            unitPrice: s.rate,
-            metaJson: { section: sec.title, unit: it.unit, itemId: it.id },
-          });
+      try {
+        const { customerId } = await upsertCustomer({
+          displayName: customer.name || 'Walk-in Customer',
+          city: customer.city || null,
+          email: customer.email || null,
+          phone: customer.phone || null,
+          addressJson: customerAddress ? JSON.stringify({ line1: customerAddress }) : null,
+        });
+        const lines: any[] = [];
+        for (const sec of WORKSHEET_SECTIONS) {
+          for (const it of sec.items) {
+            const s = rows[it.id];
+            if (!s || !s.qty) continue;
+            lines.push({
+              description: it.description,
+              quantity: s.qty,
+              unitPrice: s.rate,
+              metaJson: { section: sec.title, unit: it.unit, itemId: it.id },
+            });
+          }
         }
+        
+        if (lines.length === 0) {
+          throw new Error('Please add at least one item to the quote.');
+        }
+
+        const res = await createQuote({
+          customerId,
+          currency,
+          vatRate,
+          discountPolicy: 'none',
+          lines,
+        });
+        setQuoteId(res.quoteId);
+      } catch (e: any) {
+        console.error(e);
+        setError(e.message || 'Failed to create quote');
       }
-      const res = await createQuote({
-        customerId,
-        currency,
-        vatRate,
-        discountPolicy: 'none',
-        lines,
-      });
-      setQuoteId(res.quoteId);
     });
   }
 
@@ -272,6 +283,11 @@ export default function WorksheetQuoteBuilder() {
                  {grand.toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
                </span>
              </div>
+             {error && (
+               <div className="mt-2 text-xs font-bold text-red-600 dark:text-red-400">
+                 {error}
+               </div>
+             )}
           </div>
           
           <div className="flex items-center gap-3">

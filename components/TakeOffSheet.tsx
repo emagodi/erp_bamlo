@@ -5,7 +5,7 @@ import { Parser } from 'expr-eval';
 import { SHEET_COLUMNS, TAKEOFF_LAYOUT } from '@/lib/takeoffLayout';
 import { createQuote, upsertCustomer } from '@/app/(protected)/actions';
 import { QUOTE_LINE_MAP } from '@/lib/quoteMap';
-import { normalizeContext, missingVars } from '@/lib/expr';
+import { normalizeContext, missingVars, evalExpr } from '@/lib/expr';
 import ClearableNumberInput from './ClearableNumberInput';
 import { UserIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon, MapPinIcon, WrenchScrewdriverIcon, BeakerIcon, ArrowDownTrayIcon, PlusIcon, TrashIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
@@ -345,6 +345,9 @@ export default function TakeOffSheet() {
       });
 
       router.push(`/quotes/${res.quoteId}`);
+    } catch (err: any) {
+      console.error('Quote creation failed:', err);
+      setFormError(err.message || 'Failed to create quote. Please try again.');
     } finally {
       setCreating(false);
     }

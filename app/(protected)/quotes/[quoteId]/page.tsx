@@ -1427,24 +1427,25 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
               <h3 className="font-bold text-blue-900 dark:text-blue-100 uppercase tracking-wider text-sm">{group.section}</h3>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-              {group.rows.map((row, idx) => (
-                <div 
-                  key={row.id} 
-                  className="relative flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-                >
-                  <div className="mb-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-                            #{idx + 1}
-                          </span>
-                          {row.unit && (
-                            <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-                              {row.unit}
-                            </span>
-                          )}
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-900/50">
+                  <tr>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-12">#</th>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Description</th>
+                    <th scope="col" className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-24">Unit</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-24">Qty</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-64">Rate</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-32">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                  {group.rows.map((row, idx) => (
+                    <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{idx + 1}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                        <div className="line-clamp-2">{row.description}</div>
+                        <div className="mt-1 flex flex-wrap gap-2">
                           {row.source === 'Manual' && (
                             <span className="inline-flex items-center rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
                               MANUAL{row.addedVersion ? ` (v${row.addedVersion})` : ''}
@@ -1456,74 +1457,48 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                               LOCKED (CYCLE {row.cycle})
                             </span>
                           )}
-                        </div>
-                        <h4 className="mt-2 font-medium text-gray-900 dark:text-white line-clamp-2">
-                          {row.description}
-                        </h4>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold text-gray-900 dark:text-white">
-                          <Money value={row.amount} />
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
-                      </div>
-                    </div>
-
-                    {row.negotiation && (
-                      <div className="mt-3 rounded-lg bg-gray-50 p-2 text-xs dark:bg-gray-700/50">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={clsx(
-                              'inline-flex items-center rounded px-1.5 py-0.5 font-bold',
+                          {row.negotiation && (
+                            <span className={clsx(
+                              'inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold',
                               NEGOTIATION_BADGE_CLASSES[row.negotiation.status]
-                            )}
-                          >
-                            {formatDecisionLabel(row.negotiation.status)}
-                          </span>
-                          <span className="text-gray-600 dark:text-gray-300">
-                            Prop: <Money value={row.negotiation.proposedRate} />
-                          </span>
+                            )}>
+                              {formatDecisionLabel(row.negotiation.status)}
+                              {row.negotiation.status !== 'PENDING' && row.negotiation.reviewerName && ` by ${row.negotiation.reviewerName}`}
+                            </span>
+                          )}
                         </div>
-                        {row.negotiation.status !== 'PENDING' && row.negotiation.reviewerName && (
-                          <div className="mt-1 text-gray-500 dark:text-gray-400">
-                            By {row.negotiation.reviewerName}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
-                    <div>
-                      <span className="block text-[10px] uppercase font-semibold text-gray-500 dark:text-gray-400">Quantity</span>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        {row.qty.toLocaleString()}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="block text-[10px] uppercase font-semibold text-gray-500 dark:text-gray-400">Rate</span>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      </td>
+                      <td className="px-4 py-3 text-center text-sm text-gray-500 dark:text-gray-400">{row.unit}</td>
+                      <td className="px-4 py-3 text-right text-sm text-gray-900 dark:text-white">{row.qty.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-right text-sm text-gray-900 dark:text-white">
                         {allowEdit ? (
-                          <LineRateEditor
-                            quoteId={quote.id}
-                            lineId={row.id}
-                            defaultRate={row.rate}
-                            defaultQuantity={row.qty}
-                          />
+                          <div className="flex justify-end">
+                            <LineRateEditor
+                              quoteId={quote.id}
+                              lineId={row.id}
+                              defaultRate={row.rate}
+                              defaultQuantity={row.qty}
+                            />
+                          </div>
                         ) : (
                           <Money value={row.rate} />
                         )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex justify-end rounded-xl bg-gray-50 p-4 dark:bg-gray-800/50">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                {group.section} Subtotal: <span className="ml-2 text-lg font-bold text-gray-900 dark:text-white"><Money value={group.subtotal} /></span>
-              </div>
+                      </td>
+                      <td className="px-4 py-3 text-right text-sm font-bold text-gray-900 dark:text-white">
+                        <Money value={row.amount} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot className="bg-gray-50 dark:bg-gray-900/50">
+                  <tr>
+                    <td colSpan={5} className="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white">Section Subtotal</td>
+                    <td className="px-4 py-3 text-right text-sm font-bold text-gray-900 dark:text-white">
+                      <Money value={group.subtotal} />
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </div>
         ))}
