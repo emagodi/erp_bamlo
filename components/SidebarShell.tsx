@@ -9,12 +9,14 @@ import type { QuoteStatus } from '@/lib/workflow';
 import { USER_ROLES } from '@/lib/workflow';
 import Image from 'next/image';
 
-type NavItem = { label: string; href: string; icon: 'home' | 'quote' | 'sheet' | 'calc' | 'users' | 'clipboard' };
+type NavItem = { label: string; href: string; icon: 'home' | 'quote' | 'sheet' | 'calc' | 'users' | 'clipboard' | 'dashboard' | 'folder' | 'box' | 'desktop' };
 
 type Role = (typeof USER_ROLES)[number];
 type PageDef = NavItem & { roles?: Role[] };
 
 const PAGE_DEFS: PageDef[] = [
+  // Dashboard
+  { label: 'Dashboard', href: '/dashboard', icon: 'dashboard', roles: [] },
   // My Quotes: QS, SENIOR_QS, SALES, ADMIN
   { label: 'My Quotes', href: '/quotes', icon: 'quote', roles: ['QS', 'SENIOR_QS', 'SALES', 'ADMIN'] },
   // New Quote: QS, SENIOR_QS, ADMIN
@@ -23,13 +25,13 @@ const PAGE_DEFS: PageDef[] = [
   {
     label: 'Projects',
     href: '/projects',
-    icon: 'home',
+    icon: 'folder',
     roles: USER_ROLES.filter((r) => !['QS', 'SENIOR_QS', 'SALES'].includes(r as string)) as Role[],
   },
   // Inventory: PROJECT_MANAGER, PROCUREMENT, SECURITY, ADMIN
-  { label: 'Inventory', href: '/inventory', icon: 'sheet', roles: ['PROJECT_MANAGER', 'PROCUREMENT', 'SECURITY', 'ADMIN'] },
+  { label: 'Inventory', href: '/inventory', icon: 'box', roles: ['PROJECT_MANAGER', 'PROCUREMENT', 'SECURITY', 'ADMIN'] },
   // Assets (multipurpose): Procurement / Security / PM / Admin
-  { label: 'Assets', href: '/assets', icon: 'sheet', roles: ['PROCUREMENT', 'SECURITY', 'PROJECT_MANAGER', 'ADMIN'] },
+  { label: 'Assets', href: '/assets', icon: 'desktop', roles: ['PROCUREMENT', 'SECURITY', 'PROJECT_MANAGER', 'ADMIN'] },
   // Employees: Admin, Managing Director, Project Manager
   { label: 'Employees', href: '/employees', icon: 'users', roles: ['ADMIN', 'MANAGING_DIRECTOR', 'PROJECT_MANAGER'] },
 ];
@@ -79,6 +81,34 @@ function Icon({ name, className }: { name: NavItem['icon']; className?: string }
             strokeLinejoin="round"
             d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-10.5Z"
           />
+        </svg>
+      );
+    case 'dashboard':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
+          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6zM14 6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V6zM4 16a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2zM14 16a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-2z" />
+        </svg>
+      );
+    case 'folder':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
+          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z" />
+        </svg>
+      );
+    case 'box':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
+          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3.27 6.96 12 12.01l8.73-5.05" />
+          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 22.08V12" />
+        </svg>
+      );
+    case 'desktop':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2" strokeWidth="2" />
+          <line x1="8" y1="21" x2="16" y2="21" strokeWidth="2" strokeLinecap="round" />
+          <line x1="12" y1="17" x2="12" y2="21" strokeWidth="2" strokeLinecap="round" />
         </svg>
       );
     case 'quote':
@@ -291,28 +321,7 @@ export default function SidebarShell({
             })}
           </nav>
 
-          <div
-            className={`pt-6 pb-2 text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase transition-opacity duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-6'}`}
-          >
-            Widgets
-          </div>
-          <nav className="px-3 space-y-1">
-            <div
-              className={`py-2 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer transition-all duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-4'}`}
-            >
-              Cards
-            </div>
-            <div
-              className={`py-2 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer transition-all duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-4'}`}
-            >
-              Banners
-            </div>
-            <div
-              className={`py-2 text-gray-500 dark:text-gray-400 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer transition-all duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-4'}`}
-            >
-              Charts
-            </div>
-          </nav>
+
         </aside>
 
         {/* Scrim for mobile when sidebar open */}
