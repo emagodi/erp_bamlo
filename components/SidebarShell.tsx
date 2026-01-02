@@ -9,7 +9,7 @@ import type { QuoteStatus } from '@/lib/workflow';
 import { USER_ROLES } from '@/lib/workflow';
 import Image from 'next/image';
 
-type NavItem = { label: string; href: string; icon: 'home' | 'quote' | 'sheet' | 'calc' | 'users' | 'clipboard' | 'dashboard' | 'folder' | 'box' | 'desktop' };
+type NavItem = { label: string; href: string; icon: 'home' | 'quote' | 'sheet' | 'calc' | 'users' | 'clipboard' | 'dashboard' | 'folder' | 'box' | 'desktop' | 'list' | 'plus-document' };
 
 type Role = (typeof USER_ROLES)[number];
 type PageDef = NavItem & { roles?: Role[] };
@@ -18,9 +18,9 @@ const PAGE_DEFS: PageDef[] = [
   // Dashboard
   { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
   // My Quotes: QS, SENIOR_QS, SALES, ADMIN
-  { label: 'My Quotes', href: '/quotes', icon: 'quote', roles: ['QS', 'SENIOR_QS', 'SALES', 'ADMIN'] },
+  { label: 'My Quotes', href: '/quotes', icon: 'list', roles: ['QS', 'SENIOR_QS', 'SALES', 'ADMIN'] },
   // New Quote: QS, SENIOR_QS, ADMIN
-  { label: 'New Quote', href: '/quotes/new', icon: 'quote', roles: ['QS', 'SENIOR_QS', 'ADMIN'] },
+  { label: 'New Quote', href: '/quotes/new', icon: 'plus-document', roles: ['QS', 'SENIOR_QS', 'ADMIN'] },
   // Projects: all roles except QS, SENIOR_QS, SALES
   {
     label: 'Projects',
@@ -150,6 +150,18 @@ function Icon({ name, className }: { name: NavItem['icon']; className?: string }
           <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
           <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v0Z" />
           <path strokeWidth="2" d="M9 12h6M9 16h6" />
+        </svg>
+      );
+    case 'list':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
+          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+        </svg>
+      );
+    case 'plus-document':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
+          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m-9-6V5a2 2 0 0 1 2-2h6l4 4v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" />
         </svg>
       );
   }
