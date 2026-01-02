@@ -14,17 +14,15 @@ export default function LoginPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/40" /> {/* Overlay */}
+        <div className="absolute inset-0 bg-blue-500/30 mix-blend-multiply" /> {/* Blue Overlay */}
       </div>
 
       <div className="relative z-10 w-full max-w-[400px] p-4">
-        <div className="flex flex-col items-center space-y-6 rounded-xl bg-white/95 backdrop-blur-sm p-8 shadow-2xl">
-          <div className="flex flex-col items-center gap-2">
-            <div className="relative h-16 w-16">
-               <Image src="/barmlo_logo.png" alt="Barmlo Logo" fill className="object-contain" />
+        <div className="flex flex-col items-center space-y-6">
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-white/20 shadow-xl">
+               <Image src="/barmlo_logo.png" alt="Barmlo Logo" fill className="object-cover" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Barmlo Investments</h1>
-            <p className="text-sm text-gray-500">Sign in to your account</p>
           </div>
           
           <div className="w-full">
