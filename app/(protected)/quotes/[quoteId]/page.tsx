@@ -28,7 +28,11 @@ import {
   WrenchScrewdriverIcon,
   TagIcon,
   LockClosedIcon,
-  PencilSquareIcon
+  PencilSquareIcon,
+  PaperAirplaneIcon,
+  CheckCircleIcon,
+  ArchiveBoxIcon,
+  ArrowRightCircleIcon
 } from '@heroicons/react/24/outline';
 
 import { prisma } from '@/lib/db';
@@ -851,7 +855,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Quote {quote.id ?? '(Draft)'}</h1>
+          <h1 className="text-2xl font-bold">Quote Details</h1>
 
           <div
             className={clsx(
@@ -874,7 +878,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
               <SubmitButton
                 loadingText=""
                 className={clsx(
-                  'rounded px-3 py-1 text-sm shadow-sm transition',
+                  'rounded px-3 py-1 text-sm shadow-sm transition inline-flex items-center gap-2 font-semibold',
                   STATUS_BUTTON_LABELS[target] === 'Submit for Review' ||
                     STATUS_BUTTON_LABELS[target] === 'Send to Sales' ||
                     STATUS_BUTTON_LABELS[target] === 'Move to Negotiation'
@@ -882,6 +886,11 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                     : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                 )}
               >
+                {STATUS_BUTTON_LABELS[target] === 'Submit for Review' && <PaperAirplaneIcon className="h-4 w-4" />}
+                {STATUS_BUTTON_LABELS[target] === 'Mark Reviewed' && <CheckCircleIcon className="h-4 w-4" />}
+                {STATUS_BUTTON_LABELS[target] === 'Send to Sales' && <ArrowRightCircleIcon className="h-4 w-4" />}
+                {STATUS_BUTTON_LABELS[target] === 'Move to Negotiation' && <UserIcon className="h-4 w-4" />}
+                {STATUS_BUTTON_LABELS[target] === 'Archive' && <ArchiveBoxIcon className="h-4 w-4" />}
                 {STATUS_BUTTON_LABELS[target]}
               </SubmitButton>
             </form>
@@ -890,9 +899,10 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
           {canFinalize && (
             <form action={finalizeAction}>
               <SubmitButton
-                className="rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700"
+                className="rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 inline-flex items-center gap-2"
                 loadingText="Finalizing-"
               >
+                <CheckCircleIcon className="h-4 w-4" />
                 Finalize &amp; PDF
               </SubmitButton>
             </form>

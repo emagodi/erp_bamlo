@@ -187,14 +187,14 @@ export default async function QuotesPage(props: { searchParams: { [key: string]:
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        {/* Edit Button - Blue */}
-                        <Link
+                        {/* Edit Button - Hidden as requested */}
+                        {/* <Link
                             href={`/quotes/${q.id}`}
                             className="flex items-center gap-1 rounded border border-barmlo-blue px-2 py-1 text-xs font-bold text-barmlo-blue transition-colors hover:bg-barmlo-blue/10 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
                         >
                             <PencilSquareIcon className="h-3.5 w-3.5" />
                             Edit
-                        </Link>
+                        </Link> */}
                         {/* View Button - Green */}
                         <Link
                             href={`/quotes/${q.id}`}

@@ -291,11 +291,7 @@ export default function SidebarShell({
             <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden bg-gray-50 border border-gray-100">
                <Image src="/barmlo_logo.png" alt="Barmlo Logo" fill className="object-contain p-1" />
             </div>
-            <span
-              className={`text-xl font-bold tracking-tight text-gray-900 dark:text-white transition-opacity duration-200 ${collapsed ? 'hidden opacity-0 w-0' : 'block opacity-100'}`}
-            >
-              Barmlo
-            </span>
+            {/* Removed text as requested */}
           </div>
           {/* <div
             className={`pt-6 pb-2 text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase transition-opacity duration-200 ${collapsed ? 'hidden opacity-0' : 'block opacity-100 px-6'}`}

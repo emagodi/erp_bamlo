@@ -980,6 +980,8 @@ async function RecentProjects() {
   );
 }
 
+import { PlusIcon } from '@heroicons/react/24/outline';
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -988,6 +990,27 @@ export default async function DashboardPage({
   const user = await getCurrentUser();
   if (!user?.id || !user?.role) {
     return <div className="p-6">Please log in.</div>;
+  }
+
+  // Simplified QS Dashboard
+  if (user.role === 'QS') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 p-6">
+        <div className="text-center">
+          <p className="text-xl text-gray-600">
+            Welcome back, {user.name}.
+          </p>
+        </div>
+        
+        <Link 
+          href="/quotes/new" 
+          className="inline-flex w-full max-w-3xl justify-center items-center gap-4 rounded-2xl bg-orange-500 px-8 py-10 text-3xl font-bold text-white shadow-lg transition-all hover:bg-orange-600 hover:shadow-xl hover:-translate-y-1"
+        >
+           <PlusIcon className="h-10 w-10" />
+           Create New Quotation
+        </Link>
+      </div>
+    );
   }
 
   const { endDate, page } = await searchParams;
