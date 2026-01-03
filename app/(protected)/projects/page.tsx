@@ -34,12 +34,18 @@ export default async function ProjectsPage({
   const role = me.role as string;
   const isSeniorPM = ['SENIOR_PM', 'ADMIN', 'GENERAL_MANAGER', 'MANAGING_DIRECTOR'].includes(role);
   const isProjectManager = role === 'PROJECT_MANAGER';
+  const isSalesAccounts = role === 'SALES_ACCOUNTS';
 
   const { q: query, page: pageParam, tab } = await searchParams;
   const currentPage = parseInt(pageParam || '1', 10);
   const skip = (currentPage - 1) * ITEMS_PER_PAGE;
   
-  const currentTab = isSeniorPM ? (tab === 'assignment' ? 'assignment' : 'active') : 'active';
+  let currentTab = 'active';
+  if (isSeniorPM) {
+    currentTab = tab === 'assignment' ? 'assignment' : 'active';
+  } else if (isSalesAccounts) {
+    currentTab = tab === 'all_payments' ? 'all_payments' : 'due_today';
+  }
 
   const baseWhere: Prisma.ProjectWhereInput = {
     ...(query ? {
@@ -69,6 +75,21 @@ export default async function ProjectsPage({
              assignedToId: { not: null } // Only assigned (Active)
          };
      }
+  } else if (isSalesAccounts) {
+    if (currentTab === 'due_today') {
+       const today = new Date();
+       today.setHours(23, 59, 59, 999);
+       where = {
+         ...baseWhere,
+         paymentSchedules: {
+           some: {
+             dueOn: { lte: today },
+             status: { not: 'PAID' }
+           }
+         }
+       };
+    }
+    // 'all_payments' uses baseWhere (all projects)
   }
 
   const [projects, totalCount, projectManagers] = await Promise.all([
@@ -166,8 +187,134 @@ export default async function ProjectsPage({
             <p className="mt-1 text-sm text-gray-500">
                 {isSeniorPM && currentTab === 'assignment' 
                     ? "No projects pending assignment." 
-                    : "No active projects found."}
+                    : isSalesAccounts && currentTab === 'due_today'
+                      ? "No payments due today."
+                      : "No active projects found."}
             </p>
+          </div>
+        ) : isSalesAccounts ? (
+          <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      PROJECT
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      LOCATION
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      REF
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      DUE AMOUNT
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      ACTION(S)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {projects.map((project) => {
+                     // Calculate due amount based on filter logic roughly
+                     const dueSchedules = (project as any).paymentSchedules || [];
+                     const totalDue = dueSchedules.reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
+                     
+                     return (
+                      <tr key={project.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-600">
+                                {project.quote?.customer?.displayName || 'No customer'}
+                            </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                           <span className="text-sm text-gray-600">
+                              {project.quote?.customer?.city || '-'}
+                           </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                           <span className="text-sm text-gray-600">
+                              {project.projectNumber || project.id.slice(0, 8)}
+                           </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                           {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalDue)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <Link
+                            href={`/projects/${project.id}/payments`}
+                            className="inline-flex items-center justify-center rounded-md border border-transparent bg-orange-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 gap-2"
+                          >
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                             </svg>
+                            Receive Payment
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {/* Reuse Pagination for Table */}
+             {totalPages > 1 && (
+              <div className="border-t border-gray-200 px-4 py-3 flex items-center justify-between sm:px-6">
+                 <div className="flex-1 flex justify-between sm:hidden">
+                    <Link
+                      href={`/projects?${new URLSearchParams({ ...(query && { q: query }), ...(tab && { tab }), page: String(Math.max(1, currentPage - 1)) }).toString()}`}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                    >
+                      Previous
+                    </Link>
+                    <Link
+                      href={`/projects?${new URLSearchParams({ ...(query && { q: query }), ...(tab && { tab }), page: String(Math.min(totalPages, currentPage + 1)) }).toString()}`}
+                      className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
+                    >
+                      Next
+                    </Link>
+                 </div>
+                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Showing <span className="font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, totalCount)}</span> of <span className="font-medium">{totalCount}</span> results
+                      </p>
+                    </div>
+                    <div>
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <Link
+                           href={`/projects?${new URLSearchParams({ ...(query && { q: query }), ...(tab && { tab }), page: String(Math.max(1, currentPage - 1)) }).toString()}`}
+                           className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                        >
+                          <span className="sr-only">Previous</span>
+                          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </Link>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                           <Link
+                             key={pageNum}
+                             href={`/projects?${new URLSearchParams({ ...(query && { q: query }), ...(tab && { tab }), page: String(pageNum) }).toString()}`}
+                             className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${currentPage === pageNum ? 'z-10 bg-orange-50 border-orange-500 text-orange-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                           >
+                             {pageNum}
+                           </Link>
+                        ))}
+                        <Link
+                           href={`/projects?${new URLSearchParams({ ...(query && { q: query }), ...(tab && { tab }), page: String(Math.min(totalPages, currentPage + 1)) }).toString()}`}
+                           className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
+                        >
+                          <span className="sr-only">Next</span>
+                          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </Link>
+                      </nav>
+                    </div>
+                 </div>
+              </div>
+             )}
           </div>
         ) : (
           <>

@@ -30,7 +30,20 @@ const PAGE_DEFS: PageDef[] = [
     label: 'Projects',
     href: '/projects',
     icon: 'folder',
-    roles: USER_ROLES.filter((r) => !['QS', 'SENIOR_QS', 'SALES'].includes(r as string)) as Role[],
+    roles: USER_ROLES.filter((r) => !['QS', 'SENIOR_QS', 'SALES', 'SALES_ACCOUNTS'].includes(r as string)) as Role[],
+  },
+  // Sales Accounts Specific
+  {
+    label: 'Receive Due Payments',
+    href: '/projects?tab=due_today',
+    icon: 'banknotes',
+    roles: ['SALES_ACCOUNTS'],
+  },
+  {
+    label: 'Other Payments',
+    href: '/projects?tab=all_payments',
+    icon: 'credit-card',
+    roles: ['SALES_ACCOUNTS'],
   },
   // Inventory: PROJECT_MANAGER, PROCUREMENT, SECURITY, ADMIN
   { label: 'Inventory', href: '/inventory', icon: 'box', roles: ['PROJECT_MANAGER', 'PROCUREMENT', 'SECURITY', 'ADMIN'] },
@@ -166,6 +179,18 @@ function Icon({ name, className }: { name: NavItem['icon']; className?: string }
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
           <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+        </svg>
+      );
+    case 'banknotes':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
+           <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+        </svg>
+      );
+    case 'credit-card':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className}>
+          <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
         </svg>
       );
   }

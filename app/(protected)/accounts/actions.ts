@@ -24,6 +24,7 @@ export async function recordClientPayment(projectId: string, args: {
   receiptNo?: string | null,
   method?: string | null,
   attachmentUrl?: string | null,
+  description?: string | null,
 }) {
   const me = await getCurrentUser();
   requirePaymentRole(me?.role);
@@ -50,6 +51,7 @@ export async function recordClientPayment(projectId: string, args: {
       receiptNo: args.receiptNo ?? null,
       method: args.method ?? null,
       attachmentUrl: args.attachmentUrl ?? null,
+      description: args.description ?? null,
       recordedById: me!.id!,
     },
   });

@@ -529,10 +529,20 @@ model ClientPayment {
   receivedAt    DateTime
   receiptNo     String?
   method        String?
+  description   String?
   attachmentUrl String?
   recordedById  String
   createdAt     DateTime @default(now())
   project       Project  @relation(fields: [projectId], references: [id])
+}
+
+model File {
+  id        String   @id @default(cuid())
+  filename  String
+  mimeType  String
+  data      Bytes
+  size      Int
+  createdAt DateTime @default(now())
 }
 
 model PaymentSchedule {
