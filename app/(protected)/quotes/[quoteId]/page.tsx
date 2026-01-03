@@ -32,7 +32,8 @@ import {
   PaperAirplaneIcon,
   CheckCircleIcon,
   ArchiveBoxIcon,
-  ArrowRightCircleIcon
+  ArrowRightCircleIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
 
 import { prisma } from '@/lib/db';
@@ -57,6 +58,7 @@ import { getErrorMessage } from '@/lib/errors';
 import SubmitButton from '@/components/SubmitButton';
 import PrintButton from '@/components/PrintButton';
 import QSEditButton from '@/components/QSEditButton';
+import SalesEndorsementForm from './SalesEndorsementForm';
 
 const USER_ROLE_SET = new Set<UserRole>(USER_ROLES as unknown as UserRole[]);
 
@@ -1093,14 +1095,15 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
       )} */}
 
       {canSalesEndorse && (
-        <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Sales Endorsement</h2>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Capture the project commencement date and payment schedule for this quote.
-          </p>
-
+        <div className="space-y-4">
+          <div className="rounded-xl bg-blue-50 p-4 border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800 flex items-center gap-3">
+             <ClipboardDocumentCheckIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <h3 className="font-bold text-blue-900 dark:text-blue-100 uppercase tracking-wider text-sm">Sales Endorsement</h3>
+          </div>
+          
+          <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:bg-gray-800 dark:border-gray-700">
           {project && (
-            <div className="mt-3 space-y-1 rounded-md bg-gray-50 p-3 text-sm text-gray-600 dark:bg-gray-900/50 dark:text-gray-300">
+            <div className="mt-4 grid grid-cols-2 gap-4 rounded-xl bg-gray-50 p-4 text-sm text-gray-600 dark:bg-gray-900/50 dark:text-gray-300 border border-gray-100 dark:border-gray-700">
               <div>
                 <span className="font-semibold text-gray-900 dark:text-white">Project ID:</span> {project.id}
               </div>
@@ -1128,80 +1131,14 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
           )}
 
           {canEndorse && (
-            <form action={endorseProjectAction} className="mt-4 grid gap-4 md:grid-cols-2">
-              <label className="flex flex-col text-sm font-medium text-gray-700 dark:text-gray-300">
-                <span>Commencement date</span>
-                <input
-                  type="date"
-                  name="commenceOn"
-                  defaultValue={projectDefaults.commenceOn}
-                  required
-                  min={new Date().toISOString().split('T')[0]}
-                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:focus:ring-indigo-900"
-                />
-              </label>
-
-              <label className="flex flex-col text-sm font-medium text-gray-700 dark:text-gray-300">
-                <span>Deposit (major)</span>
-                <input
-                  type="number"
-                  name="deposit"
-                  step="0.01"
-                  min="0"
-                  max={totals.grandTotal}
-                  defaultValue={projectDefaults.deposit.toString()}
-                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:focus:ring-indigo-900"
-                />
-              </label>
-
-              <label className="flex flex-col text-sm font-medium text-gray-700 dark:text-gray-300">
-                <span>Installment (major)</span>
-                <input
-                  type="number"
-                  name="installment"
-                  step="0.01"
-                  min="0"
-                  max={totals.grandTotal}
-                  defaultValue={projectDefaults.installment.toString()}
-                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:focus:ring-indigo-900"
-                />
-              </label>
-
-              {/* <label className="flex flex-col text-sm font-medium text-gray-700">
-              <span>Installment due day</span>
-              <input
-                type="number"
-                name="dueDay"
-                min="1"
-                max="31"
-                defaultValue={projectDefaults.dueDay.toString()}
-                className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              />
-            </label> */}
-
-              <label className="flex flex-col text-sm font-medium text-gray-700 dark:text-gray-300">
-                <span>Installment Due Date</span>
-                <input
-                  name="installmentDueDate"
-                  type="date"
-                  required
-                  min={new Date().toISOString().split('T')[0]}
-                  defaultValue={projectDefaults.installmentDueOn}
-                  className="mt-1 rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:focus:ring-indigo-900"
-                />
-              </label>
-
-              <div className="md:col-span-2 flex items-end">
-                <SubmitButton
-                  className="rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                  loadingText="Saving..."
-                >
-                  Endorse & Create Project
-                </SubmitButton>
-              </div>
-            </form>
+            <SalesEndorsementForm
+              action={endorseProjectAction}
+              defaults={projectDefaults}
+              grandTotal={totals.grandTotal}
+            />
           )}
         </section>
+        </div>
       )}
 
       {role !== 'SALES' && role !== 'QS' && role !== 'SENIOR_QS' && (
@@ -1703,112 +1640,106 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                       </div>
                     </div>
 
-                    <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-2">
-                      {negotiation.items.map((item) => {
-                        const quantity = Number(item.quoteLine?.quantity ?? 0);
+                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 mt-3">
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
+                          <tr>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-12">#</th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Description</th>
+                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-24">Unit</th>
+                            <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-24">Qty</th>
+                            <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-32">Current Rate</th>
+                            <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-32">Proposed Rate</th>
+                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-48">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                          {negotiation.items.map((item, idx) => {
+                            const quantity = Number(item.quoteLine?.quantity ?? 0);
 
-                        const currentRate = item.quoteLine
-                          ? fromMinor(item.quoteLine.unitPriceMinor)
-                          : 0;
+                            const currentRate = item.quoteLine
+                              ? fromMinor(item.quoteLine.unitPriceMinor)
+                              : 0;
 
-                        const proposedRate = deriveRateFromMinor(
-                          item.proposedTotalMinor,
-                          quantity,
-                          vatRate
-                        );
+                            const proposedRate = deriveRateFromMinor(
+                              item.proposedTotalMinor,
+                              quantity,
+                              vatRate
+                            );
 
-                        const lineCycle = lineCycleById.get(item.quoteLineId) ?? 0;
+                            const lineCycle = lineCycleById.get(item.quoteLineId) ?? 0;
 
-                        const isCurrentCycleLine = lineCycle === activeCycle;
+                            const isCurrentCycleLine = lineCycle === activeCycle;
 
-                        const reviewer =
-                          item.reviewedBy?.name ?? item.reviewedBy?.email ?? null;
+                            const reviewer =
+                              item.reviewedBy?.name ?? item.reviewedBy?.email ?? null;
 
-                        const canAct =
-                          isLatest &&
-                          negotiation.status === 'OPEN' &&
-                          item.status === 'PENDING' &&
-                          isReviewer &&
-                          isCurrentCycleLine;
+                            const canAct =
+                              isLatest &&
+                              negotiation.status === 'OPEN' &&
+                              item.status === 'PENDING' &&
+                              isReviewer &&
+                              isCurrentCycleLine;
 
-                        const displayStatus =
-                          item.status === 'REVIEWED' ? 'FINAL' : item.status;
+                            const displayStatus =
+                              item.status === 'REVIEWED' ? 'FINAL' : item.status;
 
-                        return (
-                          <div
-                            key={item.id}
-                            className="relative flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-4 transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-                          >
-                            <div className="mb-3">
-                              <h4 className="font-medium text-gray-900 dark:text-white line-clamp-2 text-sm">
-                                {lineDescription.get(item.quoteLineId) ?? 'Line removed'}
-                              </h4>
-                              {!isCurrentCycleLine && (
-                                <span className="mt-1 inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                                  <LockClosedIcon className="h-3 w-3" />
-                                  LOCKED (CYCLE {lineCycle})
-                                </span>
-                              )}
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 border-t border-gray-100 pt-3 dark:border-gray-700 mb-3">
-                              <div>
-                                <span className="block text-[10px] uppercase font-semibold text-gray-500 dark:text-gray-400">
-                                  Current Rate
-                                </span>
-                                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                  <Money value={currentRate} />
-                                </div>
-                              </div>
-                              <div>
-                                <span className="block text-[10px] uppercase font-semibold text-gray-500 dark:text-gray-400">
-                                  Proposed Rate
-                                </span>
-                                <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                                  <Money value={proposedRate} />
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between gap-2 border-t border-gray-100 pt-3 dark:border-gray-700">
-                              <div className="flex flex-col gap-1">
-                                <span
-                                  className={clsx(
-                                    'inline-flex w-fit items-center rounded px-1.5 py-0.5 text-[10px] font-bold',
-                                    NEGOTIATION_BADGE_CLASSES[
-                                      displayStatus as LineNegotiationInfo['status']
-                                    ]
+                            return (
+                              <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{idx + 1}</td>
+                                <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                                  <div className="line-clamp-2">{lineDescription.get(item.quoteLineId) ?? 'Line removed'}</div>
+                                  {!isCurrentCycleLine && (
+                                    <span className="mt-1 inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                                      <LockClosedIcon className="h-3 w-3" />
+                                      LOCKED (CYCLE {lineCycle})
+                                    </span>
                                   )}
-                                >
-                                  {formatDecisionLabel(displayStatus)}
-                                </span>
-                                {reviewer && (
-                                  <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
-                                    <UserIcon className="h-3 w-3" />
-                                    <span>{reviewer}</span>
-                                    {item.reviewedAt && (
-                                      <span>• {new Date(item.reviewedAt).toLocaleDateString()}</span>
+                                  <div className="flex flex-col gap-1 mt-1">
+                                    <span
+                                      className={clsx(
+                                        'inline-flex w-fit items-center rounded px-1.5 py-0.5 text-[10px] font-bold',
+                                        NEGOTIATION_BADGE_CLASSES[
+                                          displayStatus as LineNegotiationInfo['status']
+                                        ]
+                                      )}
+                                    >
+                                      {formatDecisionLabel(displayStatus)}
+                                    </span>
+                                    {reviewer && (
+                                      <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
+                                        <UserIcon className="h-3 w-3" />
+                                        <span>{reviewer}</span>
+                                        {item.reviewedAt && (
+                                          <span>• {new Date(item.reviewedAt).toLocaleDateString()}</span>
+                                        )}
+                                      </div>
                                     )}
                                   </div>
-                                )}
-                              </div>
-
-                              <div className="flex items-center">
-                                {canAct ? (
-                                  <NegotiationActionPair
-                                    itemId={item.id}
-                                    initialRate={currentRate}
-                                  />
-                                ) : (
-                                  <span className="text-[10px] text-gray-400 italic">
-                                    {isCurrentCycleLine ? 'No actions' : `Locked`}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+                                </td>
+                                <td className="px-4 py-3 text-center text-sm text-gray-500 dark:text-gray-400">{item.quoteLine?.unit ?? '-'}</td>
+                                <td className="px-4 py-3 text-right text-sm text-gray-900 dark:text-white">{quantity.toLocaleString()}</td>
+                                <td className="px-4 py-3 text-right text-sm text-gray-900 dark:text-white"><Money value={currentRate} /></td>
+                                <td className="px-4 py-3 text-right text-sm text-blue-600 dark:text-blue-400"><Money value={proposedRate} /></td>
+                                <td className="px-4 py-3 text-center">
+                                  <div className="flex justify-center">
+                                    {canAct ? (
+                                      <NegotiationActionPair
+                                        itemId={item.id}
+                                        initialRate={currentRate}
+                                      />
+                                    ) : (
+                                      <span className="text-[10px] text-gray-400 italic">
+                                        {isCurrentCycleLine ? 'No actions' : `Locked`}
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 );

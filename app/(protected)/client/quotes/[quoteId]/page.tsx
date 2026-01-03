@@ -241,19 +241,14 @@ export default async function ClientQuotePage({ params }: ClientQuotePageParams)
     <div className="space-y-6">
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Client Quote {quote.number ?? quote.id}</h1>
+          <h1 className="text-2xl font-semibold">Project Name: {quote.customer?.displayName ?? '-'}</h1>
           <div className="text-sm text-gray-600">
             Status: {STATUS_LABELS[quote.status] ?? quote.status}
           </div>
-          {latestVersion && (
-            <div className="text-xs text-gray-500">
-              Latest version v{latestVersion.version} - {latestVersion.label ?? 'Snapshot'}
-            </div>
-          )}
         </div>
       </header>
 
-      <section className="rounded border bg-white p-4 shadow-sm">
+      {/* <section className="rounded border bg-white p-4 shadow-sm">
         <div className="grid gap-2 text-sm md:grid-cols-2">
           <div>
             <span className="font-semibold">Customer:</span> {quote.customer?.displayName ?? '-'}
@@ -268,7 +263,7 @@ export default async function ClientQuotePage({ params }: ClientQuotePageParams)
             <span className="font-semibold">Grand Total:</span> <Money value={totals.grandTotal} />
           </div>
         </div>
-      </section>
+      </section> */}
 
       <form action={submitProposal} className="space-y-4">
         <section className="rounded border bg-white shadow-sm overflow-hidden">
@@ -400,9 +395,10 @@ export default async function ClientQuotePage({ params }: ClientQuotePageParams)
         </section>
 
         {canSubmitProposal && (
-          <div className="flex justify-end">
+          <div className="flex justify-center mt-6">
             <SubmitButton
               loadingText="Submitting..."
+              className="bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5 w-full max-w-4xl py-3 text-lg font-bold rounded-xl transition-all"
             >
               Submit Proposal
             </SubmitButton>
