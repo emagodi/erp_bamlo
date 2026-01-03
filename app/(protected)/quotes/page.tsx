@@ -120,12 +120,23 @@ export default async function QuotesPage(props: { searchParams: { [key: string]:
     prisma.quote.count({ where }),
   ]);
 
+  let pageTitle = 'Quotes';
+  let pageDescription = 'Manage and view your quotations';
+
+  if (statusFilter === 'SENT_TO_SALES') {
+    pageTitle = 'New Quotations';
+    pageDescription = 'Quotations sent to sales pending review';
+  } else if (statusFilter === 'REVIEWED') {
+    pageTitle = 'Pending Endorsements';
+    pageDescription = 'Reviewed quotations ready for endorsement';
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Quotes</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Manage and view your quotations</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{pageTitle}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{pageDescription}</p>
         </div>
         <div className="flex gap-3">
           {role !== 'SALES' && (

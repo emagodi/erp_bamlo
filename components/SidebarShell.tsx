@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { signOut } from 'next-auth/react';
@@ -17,8 +17,12 @@ type PageDef = NavItem & { roles?: Role[] };
 const PAGE_DEFS: PageDef[] = [
   // Dashboard
   { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-  // My Quotes: QS, SENIOR_QS, SALES, ADMIN
-  { label: 'My Quotes', href: '/quotes', icon: 'list', roles: ['QS', 'SENIOR_QS', 'SALES', 'ADMIN'] },
+  // My Quotes: QS, SENIOR_QS, ADMIN
+  { label: 'My Quotes', href: '/quotes', icon: 'list', roles: ['QS', 'SENIOR_QS', 'ADMIN'] },
+  // New Quotations: SALES
+  { label: 'New Quotations', href: '/quotes?status=SENT_TO_SALES', icon: 'list', roles: ['SALES'] },
+  // Pending Endorsements: SALES
+  { label: 'Pending Endorsements', href: '/quotes?status=REVIEWED', icon: 'clipboard', roles: ['SALES'] },
   // New Quote: QS, SENIOR_QS, ADMIN
   { label: 'New Quote', href: '/quotes/new', icon: 'plus-document', roles: ['QS', 'SENIOR_QS', 'ADMIN'] },
   // Projects: all roles except QS, SENIOR_QS, SALES
@@ -177,6 +181,7 @@ export default function SidebarShell({
   currentUser: AuthenticatedUser | null;
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [open, setOpen] = useState(false); // mobile off-canvas
   const [collapsed, setCollapsed] = useState(false); // desktop collapsed
   const [mode, setMode] = useState<ThemeMode>('system');
@@ -300,7 +305,9 @@ export default function SidebarShell({
           </div> */}
           <nav className="px-3 space-y-1">
             {PAGE_DEFS.filter((p) => !p.roles || p.roles.includes((currentUser?.role as Role) || 'VIEWER')).map((item) => {
-              const active = pathname === item.href;
+              const active = item.href.includes('?')
+                ? pathname === item.href.split('?')[0] && searchParams.get('status') === item.href.split('?')[1].split('=')[1]
+                : pathname === item.href;
               return (
                 <Link
                   key={item.href}
