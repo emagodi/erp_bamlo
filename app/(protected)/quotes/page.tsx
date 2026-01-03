@@ -8,7 +8,8 @@ import clsx from 'clsx';
 import { 
   PlusIcon,
   EyeIcon,
-  PencilSquareIcon
+  PencilSquareIcon,
+  CheckCircleIcon
 } from '@heroicons/react/24/outline';
 import QuoteTableToolbar from './components/QuoteTableToolbar';
 import QuotePagination from './components/QuotePagination';
@@ -195,13 +196,22 @@ export default async function QuotesPage(props: { searchParams: { [key: string]:
                             <PencilSquareIcon className="h-3.5 w-3.5" />
                             Edit
                         </Link> */}
-                        {/* View Button - Green */}
+                        {/* View/Review Button - Green */}
                         <Link
                             href={`/quotes/${q.id}`}
                             className="flex items-center gap-1 rounded border border-emerald-500 px-2 py-1 text-xs font-bold text-emerald-600 transition-colors hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
                         >
-                            <EyeIcon className="h-3.5 w-3.5" />
-                            View
+                            {role === 'SENIOR_QS' ? (
+                                <>
+                                    <CheckCircleIcon className="h-3.5 w-3.5" />
+                                    Review
+                                </>
+                            ) : (
+                                <>
+                                    <EyeIcon className="h-3.5 w-3.5" />
+                                    View
+                                </>
+                            )}
                         </Link>
                       </div>
                     </td>

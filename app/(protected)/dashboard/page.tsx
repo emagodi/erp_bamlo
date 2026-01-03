@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { fromMinor } from '@/helpers/money';
 import Money from '@/components/Money';
 import ViewQuoteButton from '@/components/ViewQuoteButton';
+import { PlusIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId: string; role: string; endDate?: string; currentPage?: number }) {
   // Parse date or use default (today)
@@ -980,8 +981,6 @@ async function RecentProjects() {
   );
 }
 
-import { PlusIcon } from '@heroicons/react/24/outline';
-
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -1008,6 +1007,27 @@ export default async function DashboardPage({
         >
            <PlusIcon className="h-10 w-10" />
            Create New Quotation
+        </Link>
+      </div>
+    );
+  }
+
+  // Simplified Senior QS Dashboard
+  if (user.role === 'SENIOR_QS') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 p-6">
+        <div className="text-center">
+          <p className="text-xl text-gray-600">
+            Welcome back, {user.name}.
+          </p>
+        </div>
+        
+        <Link 
+          href="/quotes" 
+          className="inline-flex w-full max-w-3xl justify-center items-center gap-4 rounded-2xl bg-orange-500 px-8 py-10 text-3xl font-bold text-white shadow-lg transition-all hover:bg-orange-600 hover:shadow-xl hover:-translate-y-1"
+        >
+           <CheckCircleIcon className="h-10 w-10" />
+           Review Quotations
         </Link>
       </div>
     );
