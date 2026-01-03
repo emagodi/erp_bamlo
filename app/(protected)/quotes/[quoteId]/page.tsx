@@ -1514,6 +1514,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
           </div>
         ))}
       </div>
+      {role === 'ADMIN' && (
       <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Versions</h2>
 
@@ -1628,6 +1629,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
           })}
         </div>
       </section>
+      )}
       {canViewVersionsAndNegotiations && (
         <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Negotiations</h2>
