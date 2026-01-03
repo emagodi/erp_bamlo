@@ -879,19 +879,17 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                 loadingText=""
                 className={clsx(
                   'rounded-xl px-6 py-3 text-sm shadow-md transition-all inline-flex items-center justify-center gap-3 font-bold',
-                  STATUS_BUTTON_LABELS[target] === 'Send to Sales'
+                  STATUS_BUTTON_LABELS[target] === 'Send to Sales' || STATUS_BUTTON_LABELS[target] === 'Move to Negotiation'
                     ? 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5 min-w-[450px] mt-6 py-2'
-                    : STATUS_BUTTON_LABELS[target] === 'Submit for Review' ||
-                      STATUS_BUTTON_LABELS[target] === 'Move to Negotiation'
+                    : STATUS_BUTTON_LABELS[target] === 'Submit for Review'
                     ? 'bg-barmlo-green text-white hover:bg-barmlo-green/90 min-w-[200px]'
                     : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 min-w-[200px]'
                 )}
               >
                 {STATUS_BUTTON_LABELS[target] === 'Submit for Review' && <PaperAirplaneIcon className="h-5 w-5" />}
                 {STATUS_BUTTON_LABELS[target] === 'Mark Reviewed' && <CheckCircleIcon className="h-5 w-5" />}
-                {STATUS_BUTTON_LABELS[target] === 'Move to Negotiation' && <UserIcon className="h-5 w-5" />}
                 {STATUS_BUTTON_LABELS[target] === 'Archive' && <ArchiveBoxIcon className="h-5 w-5" />}
-                <span className={STATUS_BUTTON_LABELS[target] === 'Send to Sales' ? 'text-lg' : ''}>{STATUS_BUTTON_LABELS[target]}</span>
+                <span className={STATUS_BUTTON_LABELS[target] === 'Send to Sales' || STATUS_BUTTON_LABELS[target] === 'Move to Negotiation' ? 'text-lg' : ''}>{STATUS_BUTTON_LABELS[target]}</span>
               </SubmitButton>
             </form>
           ))}

@@ -129,13 +129,15 @@ export default async function QuotesPage(props: { searchParams: { [key: string]:
           <p className="text-sm text-gray-500 dark:text-gray-400">Manage and view your quotations</p>
         </div>
         <div className="flex gap-3">
-          <Link
-            href="/quotes/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-barmlo-blue px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:bg-barmlo-blue/90 hover:shadow-lg dark:bg-blue-500 dark:hover:bg-blue-600"
-          >
-            <PlusIcon className="h-4 w-4" />
-            New Quote
-          </Link>
+          {role !== 'SALES' && (
+            <Link
+              href="/quotes/new"
+              className="inline-flex items-center gap-2 rounded-xl bg-barmlo-blue px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:bg-barmlo-blue/90 hover:shadow-lg dark:bg-blue-500 dark:hover:bg-blue-600"
+            >
+              <PlusIcon className="h-4 w-4" />
+              New Quote
+            </Link>
+          )}
         </div>
       </div>
 
