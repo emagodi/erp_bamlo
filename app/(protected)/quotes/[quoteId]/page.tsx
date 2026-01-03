@@ -855,7 +855,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
     <div className="space-y-6">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Quote Details</h1>
+          <h1 className="text-2xl font-bold">Project Name: {quote.customer?.displayName}</h1>
 
           <div
             className={clsx(
@@ -878,20 +878,20 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
               <SubmitButton
                 loadingText=""
                 className={clsx(
-                  'rounded px-3 py-1 text-sm shadow-sm transition inline-flex items-center gap-2 font-semibold',
-                  STATUS_BUTTON_LABELS[target] === 'Submit for Review' ||
-                    STATUS_BUTTON_LABELS[target] === 'Send to Sales' ||
-                    STATUS_BUTTON_LABELS[target] === 'Move to Negotiation'
-                    ? 'bg-barmlo-green text-white hover:bg-barmlo-green/90'
-                    : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                  'rounded-xl px-6 py-3 text-sm shadow-md transition-all inline-flex items-center justify-center gap-3 font-bold',
+                  STATUS_BUTTON_LABELS[target] === 'Send to Sales'
+                    ? 'bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5 min-w-[450px] mt-6 py-2'
+                    : STATUS_BUTTON_LABELS[target] === 'Submit for Review' ||
+                      STATUS_BUTTON_LABELS[target] === 'Move to Negotiation'
+                    ? 'bg-barmlo-green text-white hover:bg-barmlo-green/90 min-w-[200px]'
+                    : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 min-w-[200px]'
                 )}
               >
-                {STATUS_BUTTON_LABELS[target] === 'Submit for Review' && <PaperAirplaneIcon className="h-4 w-4" />}
-                {STATUS_BUTTON_LABELS[target] === 'Mark Reviewed' && <CheckCircleIcon className="h-4 w-4" />}
-                {STATUS_BUTTON_LABELS[target] === 'Send to Sales' && <ArrowRightCircleIcon className="h-4 w-4" />}
-                {STATUS_BUTTON_LABELS[target] === 'Move to Negotiation' && <UserIcon className="h-4 w-4" />}
-                {STATUS_BUTTON_LABELS[target] === 'Archive' && <ArchiveBoxIcon className="h-4 w-4" />}
-                {STATUS_BUTTON_LABELS[target]}
+                {STATUS_BUTTON_LABELS[target] === 'Submit for Review' && <PaperAirplaneIcon className="h-5 w-5" />}
+                {STATUS_BUTTON_LABELS[target] === 'Mark Reviewed' && <CheckCircleIcon className="h-5 w-5" />}
+                {STATUS_BUTTON_LABELS[target] === 'Move to Negotiation' && <UserIcon className="h-5 w-5" />}
+                {STATUS_BUTTON_LABELS[target] === 'Archive' && <ArchiveBoxIcon className="h-5 w-5" />}
+                <span className={STATUS_BUTTON_LABELS[target] === 'Send to Sales' ? 'text-lg' : ''}>{STATUS_BUTTON_LABELS[target]}</span>
               </SubmitButton>
             </form>
           ))}
@@ -910,7 +910,8 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
         </div>
       </header>
 
-      <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      {/* Summary section hidden as per request */}
+      {/* <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
         <div className="grid gap-2 text-sm md:grid-cols-2 text-gray-700 dark:text-gray-300">
           <div>
             <span className="font-semibold text-gray-900 dark:text-white">Customer:</span> {quote.customer?.displayName ?? '-'}
@@ -951,7 +952,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
             <span className="font-semibold text-gray-900 dark:text-white">Grand Total:</span> <Money value={totals.grandTotal} />
           </div>
         </div>
-      </section>
+      </section> */}
       {/* {isSales && (
         <section className="rounded border bg-white p-4 shadow-sm">
           <h3 className="text-lg font-semibold">Sales Endorsement</h3>
@@ -1205,7 +1206,7 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
         </section>
       )}
 
-      {role !== 'SALES' && (
+      {role !== 'SALES' && role !== 'QS' && role !== 'SENIOR_QS' && (
         <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
           <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
             <div className="lg:max-w-md">

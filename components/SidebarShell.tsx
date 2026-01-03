@@ -497,7 +497,7 @@ export default function SidebarShell({
             </div>
           </header>
 
-          <main className="w-full px-6 md:px-8 pb-6 overflow-y-auto overflow-x-hidden no-scrollbar min-h-0 relative z-10">
+          <main className="w-full px-6 md:px-8 pb-6 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 min-h-0 relative z-10">
             {children}
           </main>
         </div>

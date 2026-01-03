@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { fromMinor } from '@/helpers/money';
 import Money from '@/components/Money';
 import ViewQuoteButton from '@/components/ViewQuoteButton';
-import { PlusIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { PlusIcon } from '@heroicons/react/24/outline';
 
 async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId: string; role: string; endDate?: string; currentPage?: number }) {
   // Parse date or use default (today)
@@ -299,6 +299,7 @@ async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId
                   }
               }
           },
+          include: { customer: { select: { displayName: true } } },
       });
   }
 
@@ -1023,12 +1024,14 @@ export default async function DashboardPage({
         </div>
         
         <Link 
-          href="/quotes" 
-          className="inline-flex w-full max-w-3xl justify-center items-center gap-4 rounded-2xl bg-orange-500 px-8 py-10 text-3xl font-bold text-white shadow-lg transition-all hover:bg-orange-600 hover:shadow-xl hover:-translate-y-1"
-        >
-           <CheckCircleIcon className="h-10 w-10" />
-           Review Quotations
-        </Link>
+               href="/quotes" 
+               className="inline-flex w-full max-w-3xl justify-center items-center gap-4 rounded-2xl bg-orange-500 px-8 py-10 text-3xl font-bold text-white shadow-lg transition-all hover:bg-orange-600 hover:shadow-xl hover:-translate-y-1"
+             >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-10 w-10">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                Review Quotations
+             </Link>
       </div>
     );
   }
