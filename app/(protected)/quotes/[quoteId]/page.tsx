@@ -30,7 +30,6 @@ import {
   LockClosedIcon,
   PencilSquareIcon,
   PaperAirplaneIcon,
-  CheckCircleIcon,
   ArchiveBoxIcon,
   ArrowRightCircleIcon,
   ClipboardDocumentCheckIcon
@@ -59,6 +58,7 @@ import SubmitButton from '@/components/SubmitButton';
 import PrintButton from '@/components/PrintButton';
 import QSEditButton from '@/components/QSEditButton';
 import SalesEndorsementForm from './SalesEndorsementForm';
+import NegotiationsList from './NegotiationsList';
 
 const USER_ROLE_SET = new Set<UserRole>(USER_ROLES as unknown as UserRole[]);
 
@@ -889,7 +889,11 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                 )}
               >
                 {STATUS_BUTTON_LABELS[target] === 'Submit for Review' && <PaperAirplaneIcon className="h-5 w-5" />}
-                {STATUS_BUTTON_LABELS[target] === 'Mark Reviewed' && <CheckCircleIcon className="h-5 w-5" />}
+                {STATUS_BUTTON_LABELS[target] === 'Mark Reviewed' && (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                )}
                 {STATUS_BUTTON_LABELS[target] === 'Archive' && <ArchiveBoxIcon className="h-5 w-5" />}
                 <span className={STATUS_BUTTON_LABELS[target] === 'Send to Sales' || STATUS_BUTTON_LABELS[target] === 'Move to Negotiation' ? 'text-lg' : ''}>{STATUS_BUTTON_LABELS[target]}</span>
               </SubmitButton>
@@ -902,7 +906,9 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
                 className="rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 inline-flex items-center gap-2"
                 loadingText="Finalizing-"
               >
-                <CheckCircleIcon className="h-4 w-4" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
                 Finalize &amp; PDF
               </SubmitButton>
             </form>
@@ -1566,187 +1572,14 @@ export default async function QuoteDetailPage({ params }: QuotePageParams) {
       </section>
       )}
       {canViewVersionsAndNegotiations && (
-        <section className="rounded border bg-white p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Negotiations</h2>
-
-          <div className="mt-3 space-y-4">
-            {negotiationSnapshots.length === 0 && (
-              <div className="text-sm text-gray-500 dark:text-gray-400">No negotiations yet.</div>
-            )}
-
-            {negotiationSnapshots.map(
-              ({ negotiation, proposedSnapshot, originalSnapshot }, index) => {
-                const isLatest = index === 0;
-
-                const allItemsResolved = negotiation.items.every(
-                  (item) => item.status === 'OK' || item.status === 'ACCEPTED'
-                );
-
-                const canCloseProposal =
-                  isReviewer && isLatest && negotiation.status === 'OPEN' && allItemsResolved;
-
-                const totalDelta =
-                  proposedSnapshot.totals.grandTotal - (originalSnapshot?.totals.grandTotal ?? 0);
-
-                const lineDescription = new Map(
-                  quote.lines.map((line) => [line.id, line.description])
-                );
-
-                return (
-                  <div key={negotiation.id} className="rounded border border-gray-200 p-3 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {negotiation.status} - {new Date(negotiation.createdAt).toLocaleString()}
-                        </div>
-
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          Requested by{' '}
-                          {negotiation.createdBy?.name ?? negotiation.createdBy?.email ?? 'Client'}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-2 text-sm font-semibold">
-                        <div className="text-gray-900 dark:text-white">
-                          Proposal Total: <Money value={proposedSnapshot.totals.grandTotal} />
-                          {totalDelta !== 0 && (
-                            <span
-                              className={clsx(
-                                'ml-2 inline-flex items-center text-xs font-semibold',
-
-                                totalDelta > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
-                              )}
-                            >
-                              {totalDelta > 0 ? '+' : '-'}
-
-                              <Money value={Math.abs(totalDelta)} />
-                            </span>
-                          )}
-                        </div>
-
-                        {canCloseProposal && (
-                          <form
-                            action={closeNegotiationAction.bind(null, negotiation.id)}
-                            className="inline-flex"
-                          >
-                            <SubmitButton
-                              className="inline-flex items-center gap-2 rounded bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600"
-                              loadingText="Closing..."
-                            >
-                              Close Proposal
-                            </SubmitButton>
-                          </form>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 mt-3">
-                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-900/50">
-                          <tr>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-12">#</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Description</th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-24">Unit</th>
-                            <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-24">Qty</th>
-                            <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-32">Current Rate</th>
-                            <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-32">Proposed Rate</th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-48">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-                          {negotiation.items.map((item, idx) => {
-                            const quantity = Number(item.quoteLine?.quantity ?? 0);
-
-                            const currentRate = item.quoteLine
-                              ? fromMinor(item.quoteLine.unitPriceMinor)
-                              : 0;
-
-                            const proposedRate = deriveRateFromMinor(
-                              item.proposedTotalMinor,
-                              quantity,
-                              vatRate
-                            );
-
-                            const lineCycle = lineCycleById.get(item.quoteLineId) ?? 0;
-
-                            const isCurrentCycleLine = lineCycle === activeCycle;
-
-                            const reviewer =
-                              item.reviewedBy?.name ?? item.reviewedBy?.email ?? null;
-
-                            const canAct =
-                              isLatest &&
-                              negotiation.status === 'OPEN' &&
-                              item.status === 'PENDING' &&
-                              isReviewer &&
-                              isCurrentCycleLine;
-
-                            const displayStatus =
-                              item.status === 'REVIEWED' ? 'FINAL' : item.status;
-
-                            return (
-                              <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{idx + 1}</td>
-                                <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                                  <div className="line-clamp-2">{lineDescription.get(item.quoteLineId) ?? 'Line removed'}</div>
-                                  {!isCurrentCycleLine && (
-                                    <span className="mt-1 inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                                      <LockClosedIcon className="h-3 w-3" />
-                                      LOCKED (CYCLE {lineCycle})
-                                    </span>
-                                  )}
-                                  <div className="flex flex-col gap-1 mt-1">
-                                    <span
-                                      className={clsx(
-                                        'inline-flex w-fit items-center rounded px-1.5 py-0.5 text-[10px] font-bold',
-                                        NEGOTIATION_BADGE_CLASSES[
-                                          displayStatus as LineNegotiationInfo['status']
-                                        ]
-                                      )}
-                                    >
-                                      {formatDecisionLabel(displayStatus)}
-                                    </span>
-                                    {reviewer && (
-                                      <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
-                                        <UserIcon className="h-3 w-3" />
-                                        <span>{reviewer}</span>
-                                        {item.reviewedAt && (
-                                          <span>• {new Date(item.reviewedAt).toLocaleDateString()}</span>
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-3 text-center text-sm text-gray-500 dark:text-gray-400">{item.quoteLine?.unit ?? '-'}</td>
-                                <td className="px-4 py-3 text-right text-sm text-gray-900 dark:text-white">{quantity.toLocaleString()}</td>
-                                <td className="px-4 py-3 text-right text-sm text-gray-900 dark:text-white"><Money value={currentRate} /></td>
-                                <td className="px-4 py-3 text-right text-sm text-blue-600 dark:text-blue-400"><Money value={proposedRate} /></td>
-                                <td className="px-4 py-3 text-center">
-                                  <div className="flex justify-center">
-                                    {canAct ? (
-                                      <NegotiationActionPair
-                                        itemId={item.id}
-                                        initialRate={currentRate}
-                                      />
-                                    ) : (
-                                      <span className="text-[10px] text-gray-400 italic">
-                                        {isCurrentCycleLine ? 'No actions' : `Locked`}
-                                      </span>
-                                    )}
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                );
-              }
-            )}
-          </div>
-        </section>
+        <NegotiationsList
+          negotiationSnapshots={negotiationSnapshots}
+          quoteLines={quote.lines}
+          isReviewer={isReviewer}
+          vatRate={vatRate}
+          activeCycle={activeCycle}
+          closeNegotiationAction={closeNegotiationAction}
+        />
       )}
 
       <div className="flex gap-2">

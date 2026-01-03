@@ -99,7 +99,7 @@ export default function SalesEndorsementForm({ action, defaults, grandTotal }: P
 
       <div className="md:col-span-2 flex justify-center mt-4">
         <SubmitButton
-          className={`rounded-xl px-6 py-3 text-sm font-bold text-white shadow-md transition-all min-w-[600px] ${
+          className={`rounded-xl px-6 py-3 text-sm font-bold text-white shadow-md transition-all w-full ${
             isValid
               ? 'bg-orange-500 hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5'
               : 'bg-gray-300 cursor-not-allowed'
