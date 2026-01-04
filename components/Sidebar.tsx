@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
 
 const BASE: { label:string; href:string; icon:string; roles?: string[] }[] = [
@@ -18,15 +17,13 @@ const BASE: { label:string; href:string; icon:string; roles?: string[] }[] = [
 export default async function Sidebar() {
   const me = await getCurrentUser();
   const role = (me?.role ?? 'VIEWER') as string;
-  const pathname = usePathname();
   const pages = BASE.filter(p => !p.roles || p.roles.includes(role));
 
   return (
     <nav className="flex flex-col gap-2 p-2">
       {pages.map(p => {
-        const active = pathname === p.href || (p.href !== '/' && pathname.startsWith(p.href));
         return (
-          <Link key={p.href} href={p.href} className={`px-3 py-2 rounded ${active ? 'bg-orange-50 text-orange-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          <Link key={p.href} href={p.href} className="px-3 py-2 rounded bg-gray-100 text-gray-700 hover:bg-gray-200">
             {p.label}
           </Link>
         );

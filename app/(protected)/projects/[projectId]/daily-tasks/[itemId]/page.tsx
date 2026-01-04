@@ -164,7 +164,7 @@ export default async function TaskReportPage({
 
       {/* Report Form */}
       <form action={submitReport} className="rounded-lg border bg-white p-6 shadow-sm space-y-4">
-        <h3 className="text-lg font-semibold">Today's Progress Report</h3>
+        <h3 className="text-lg font-semibold">Today&apos;s Progress Report</h3>
 
         <div>
           <label htmlFor="activity" className="block text-sm font-medium text-gray-700 mb-1">

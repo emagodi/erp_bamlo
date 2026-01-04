@@ -330,9 +330,16 @@ export default function SidebarShell({
           </div> */}
           <nav className="px-3 space-y-1">
             {PAGE_DEFS.filter((p) => !p.roles || p.roles.includes((currentUser?.role as Role) || 'VIEWER')).map((item) => {
-              const active = item.href.includes('?')
-                ? pathname === item.href.split('?')[0] && searchParams.get('status') === item.href.split('?')[1].split('=')[1]
-                : pathname === item.href;
+              const [base, queryString] = item.href.split('?');
+              let active = pathname === base;
+              if (queryString) {
+                const params = new URLSearchParams(queryString);
+                params.forEach((v, k) => {
+                  if (searchParams.get(k) !== v) {
+                    active = false;
+                  }
+                });
+              }
               return (
                 <Link
                   key={item.href}

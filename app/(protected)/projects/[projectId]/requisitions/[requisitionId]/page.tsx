@@ -210,8 +210,8 @@ export default async function ProjectRequisitionDetailPage({
               <h3 className="text-sm font-medium text-blue-800">Draft Requisition</h3>
               <div className="mt-2 text-sm text-blue-700">
                 <p>
-                  This requisition is in draft status. Review the items above and click "Submit to
-                  Procurement" when ready to send it for approval.
+                  This requisition is in draft status. Review the items above and click &quot;Submit to
+                  Procurement&quot; when ready to send it for approval.
                 </p>
               </div>
             </div>

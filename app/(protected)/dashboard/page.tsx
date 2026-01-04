@@ -1231,7 +1231,7 @@ export default async function DashboardPage({
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Welcome back, {user.name}. Here's what's happening today.
+          Welcome back, {user.name}. Here&apos;s what&apos;s happening today.
         </p>
       </div>
 

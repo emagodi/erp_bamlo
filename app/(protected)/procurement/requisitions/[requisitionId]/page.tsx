@@ -780,7 +780,7 @@ export default async function RequisitionDetailPage({
           <section className="rounded border bg-white p-4 shadow-sm">
             <h3 className="text-lg font-semibold">Stage Purchases</h3>
             <p className="text-sm text-gray-500 mb-4">
-              Enter items you have bought to <b>stage</b> them. Once you are ready, click "Create PO" to group them for Security.
+              Enter items you have bought to <b>stage</b> them. Once you are ready, click &quot;Create PO&quot; to group them for Security.
             </p>
 
             {/* Staged Items List */}
