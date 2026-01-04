@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { checkEmployeeAvailability } from './actions';
 
@@ -41,9 +41,9 @@ export default function EmployeeAssignmentModal({
       setLocalSelected(selectedIds);
       checkAvailability();
     }
-  }, [isOpen, selectedIds, startDate, endDate]);
+  }, [isOpen, selectedIds, startDate, endDate, checkAvailability]);
 
-  async function checkAvailability() {
+  const checkAvailability = useCallback(async () => {
     if (!startDate || !endDate) return;
     setChecking(true);
     try {
@@ -57,7 +57,7 @@ export default function EmployeeAssignmentModal({
     } finally {
       setChecking(false);
     }
-  }
+  }, [startDate, endDate, employees, scheduleItemId]);
 
   const categories = ['ALL', ...Array.from(new Set(employees.map((e) => e.role)))];
 

@@ -11,6 +11,7 @@ import { fromMinor } from '@/helpers/money';
 import Money from '@/components/Money';
 import ViewQuoteButton from '@/components/ViewQuoteButton';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { ProjectAssigner } from '@/app/(protected)/projects/project-assigner';
 
 async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId: string; role: string; endDate?: string; currentPage?: number }) {
   // Parse date or use default (today)
@@ -249,17 +250,25 @@ async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId
 
   // Logic for Senior PM (Project Assignment)
   let assignmentTasks: any[] = [];
+  let projectManagers: any[] = [];
   if (roles.SENIOR_PM) {
-     assignmentTasks = await prisma.project.findMany({
-         where: {
-             status: { notIn: ['CREATED', 'COMPLETED', 'CLOSED'] }, // Unlocked and not finished
-             assignedToId: null, // Unassigned
-         },
-         include: {
-             quote: { select: { customer: { select: { displayName: true } } } }
-         },
-         orderBy: { createdAt: 'desc' }
-     });
+     [assignmentTasks, projectManagers] = await Promise.all([
+         prisma.project.findMany({
+             where: {
+                 status: { notIn: ['CREATED', 'COMPLETED', 'CLOSED'] }, // Unlocked and not finished
+                 assignedToId: null, // Unassigned
+             },
+             include: {
+                 quote: { select: { customer: { select: { displayName: true } } } }
+             },
+             orderBy: { createdAt: 'desc' }
+         }),
+         prisma.user.findMany({
+             where: { role: 'PROJECT_MANAGER' },
+             select: { id: true, name: true, email: true },
+             orderBy: { name: 'asc' },
+         })
+     ]);
   }
 
   // Logic for Project Manager (My Assigned Projects)
@@ -364,7 +373,7 @@ async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId
     ...securityOutgoing.map(d => ({ type: 'SECURITY_OUTGOING' as const, data: d, date: d.createdAt })),
     ...securityIncoming.map(po => ({ type: 'SECURITY_INCOMING' as const, data: po, date: po.createdAt })),
     ...driverTasks.map(d => ({ type: 'DRIVER_TASK' as const, data: d, date: new Date(d.createdAt) })),
-    ...assignmentTasks.map(p => ({ type: 'PROJECT_ASSIGNMENT' as const, data: p, date: p.createdAt })),
+    // assignmentTasks handled separately for Senior PM
     ...quoteReviews.map(q => ({ type: 'QUOTE_REVIEW' as const, data: q, date: q.updatedAt })),
     ...negotiationReviews.map(q => ({ type: 'NEGOTIATION_REVIEW' as const, data: q, date: q.updatedAt })),
     ...salesTasks.map(q => ({ type: 'SALES_TASK' as const, data: q, date: q.updatedAt })),
@@ -381,6 +390,26 @@ async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId
 
 
     return (
+      <div className="space-y-6">
+        {roles.SENIOR_PM && (
+          <div className="flex flex-col items-center justify-center py-6 mb-8">
+            <Link
+              href="/projects?tab=assignment"
+              className="inline-flex w-full max-w-3xl justify-center items-center gap-4 rounded-2xl bg-orange-500 px-8 py-10 text-3xl font-bold text-white shadow-lg transition-all hover:bg-orange-600 hover:shadow-xl hover:-translate-y-1"
+            >
+              <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Unassigned Projects
+              {assignmentTasks.length > 0 && (
+                <span className="ml-4 flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm text-orange-600">
+                  {assignmentTasks.length}
+                </span>
+              )}
+            </Link>
+          </div>
+        )}
+
       <div className="rounded-lg bg-white p-6 shadow">
 
         <h3 className="text-lg font-medium leading-6 text-gray-900">Pending Tasks</h3>
@@ -916,6 +945,7 @@ async function PendingTasks({ userId, role, endDate, currentPage = 1 }: { userId
           )}
         </div>
       </div>
+    </div>
     );
   }
 
@@ -1032,6 +1062,41 @@ export default async function DashboardPage({
                 </svg>
                 Review Quotations
              </Link>
+      </div>
+    );
+  }
+
+  // Simplified Senior PM Dashboard
+  if (user.role === 'SENIOR_PM') {
+    const unassignedCount = await prisma.project.count({
+      where: {
+        status: { notIn: ['CREATED', 'COMPLETED', 'CLOSED'] },
+        assignedToId: null,
+      },
+    });
+
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 p-6">
+        <div className="text-center">
+          <p className="text-xl text-gray-600">
+            Welcome back, {user.name}.
+          </p>
+        </div>
+        
+        <Link
+          href="/projects?tab=assignment"
+          className="inline-flex w-full max-w-3xl justify-center items-center gap-4 rounded-2xl bg-orange-500 px-8 py-10 text-3xl font-bold text-white shadow-lg transition-all hover:bg-orange-600 hover:shadow-xl hover:-translate-y-1"
+        >
+          <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          Unassigned Projects
+          {unassignedCount > 0 && (
+            <span className="ml-4 flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm text-orange-600">
+              {unassignedCount}
+            </span>
+          )}
+        </Link>
       </div>
     );
   }

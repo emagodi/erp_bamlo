@@ -30,7 +30,26 @@ const PAGE_DEFS: PageDef[] = [
     label: 'Projects',
     href: '/projects',
     icon: 'folder',
-    roles: USER_ROLES.filter((r) => !['QS', 'SENIOR_QS', 'SALES', 'SALES_ACCOUNTS'].includes(r as string)) as Role[],
+    roles: USER_ROLES.filter((r) => !['QS', 'SENIOR_QS', 'SALES', 'SALES_ACCOUNTS', 'SENIOR_PM'].includes(r as string)) as Role[],
+  },
+  // Senior PM Specific
+  {
+    label: 'Active Projects',
+    href: '/projects?tab=active',
+    icon: 'folder',
+    roles: ['SENIOR_PM'],
+  },
+  {
+    label: 'Unassigned Projects',
+    href: '/projects?tab=assignment',
+    icon: 'users',
+    roles: ['SENIOR_PM'],
+  },
+  {
+    label: 'Planning Pending',
+    href: '/projects?tab=planning',
+    icon: 'clipboard',
+    roles: ['SENIOR_PM'],
   },
   // Sales Accounts Specific
   {

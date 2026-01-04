@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { safeAction } from '@/lib/safe-action';
 import { revalidatePath } from 'next/cache';
+import { generatePaymentSchedule } from '@/app/(protected)/projects/actions';
 
 const createProjectFromQuoteSchema = z.object({
     quoteId: z.string(),
@@ -105,6 +106,13 @@ export const createProjectFromQuote = safeAction(createProjectFromQuoteSchema, a
             assignedToId: salesAccountsUser.id,
         },
     });
+
+    // Immediately generate the payment schedule (Deposit + monthly installments)
+    try {
+        await generatePaymentSchedule(project.id);
+    } catch (error) {
+        console.error('Failed to generate payment schedule on project creation', error);
+    }
 
     try {
         revalidatePath('/projects');

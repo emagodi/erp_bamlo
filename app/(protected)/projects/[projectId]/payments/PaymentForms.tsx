@@ -3,81 +3,48 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { recordClientPayment } from '@/app/(protected)/accounts/actions';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 type Props = {
   projectId: string;
-  defaultTab?: 'deposit' | 'other';
+  initialAmount?: number;
+  fixedType: 'DEPOSIT' | 'INSTALLMENT';
+  customerName?: string;
   onCancel?: () => void;
   cancelHref?: string;
 };
 
-export default function PaymentForms({ projectId, defaultTab = 'deposit', onCancel, cancelHref }: Props) {
-  return (
-    <div className="w-full bg-white">
-      <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="deposit">Deposit</TabsTrigger>
-          <TabsTrigger value="other">Other Payment</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="deposit">
-          <PaymentForm 
-            projectId={projectId} 
-            type="DEPOSIT" 
-            onSuccess={onCancel || (() => {})}
-            onCancel={onCancel}
-            cancelHref={cancelHref}
-            submitLabel="Save Deposit"
-          />
-        </TabsContent>
-        
-        <TabsContent value="other">
-          <PaymentForm 
-            projectId={projectId} 
-            type="INSTALLMENT" 
-            defaultType="INSTALLMENT"
-            showTypeSelect={false}
-            onSuccess={onCancel || (() => {})}
-            onCancel={onCancel}
-            cancelHref={cancelHref}
-            submitLabel="Save Installment"
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
+export default function PaymentForms({ projectId, initialAmount = 0, fixedType, customerName, onCancel, cancelHref }: Props) {
+  return <PaymentForm projectId={projectId} type={fixedType} initialAmount={initialAmount} onSuccess={onCancel || (() => {})} onCancel={onCancel} cancelHref={cancelHref} submitLabel="Record Payment" customerName={customerName} />;
 }
 
 function PaymentForm({ 
   projectId, 
   type: fixedType, 
-  defaultType, 
-  showTypeSelect,
+  initialAmount,
   onSuccess,
   onCancel,
   cancelHref,
-  submitLabel
+  submitLabel,
+  customerName
 }: { 
   projectId: string; 
   type: 'DEPOSIT' | 'INSTALLMENT' | 'ADJUSTMENT'; 
-  defaultType?: 'INSTALLMENT' | 'ADJUSTMENT';
-  showTypeSelect?: boolean;
+  initialAmount?: number;
   onSuccess: () => void;
   onCancel?: () => void;
   cancelHref?: string;
   submitLabel: string;
+  customerName?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [type, setType] = useState(defaultType || fixedType);
+  const [type] = useState(fixedType);
   
   // Form State
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(initialAmount ? String(initialAmount) : '');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [ref, setRef] = useState(''); // Receipt No
+  const [ref, setRef] = useState('');
   const [description, setDescription] = useState('');
   const [method, setMethod] = useState('CASH');
   const [file, setFile] = useState<File | null>(null);
@@ -91,26 +58,17 @@ function PaymentForm({
 
     setLoading(true);
     try {
-      let attachmentUrl = null;
-
-      // Handle File Upload
+      let attachmentUrl: string | null = null;
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
-        
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
         if (!res.ok) throw new Error('File upload failed');
         const data = await res.json();
         attachmentUrl = data.url;
       }
-
-      // Record Payment
       await recordClientPayment(projectId, {
-        type: showTypeSelect ? (type as any) : fixedType,
+        type: fixedType,
         amount: Number(amount),
         receivedAt: date,
         receiptNo: ref,
@@ -135,22 +93,23 @@ function PaymentForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {showTypeSelect && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Payment Type</label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value as any)}
-              className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="INSTALLMENT">Installment</option>
-              <option value="ADJUSTMENT">Adjustment</option>
-              <option value="DEPOSIT">Deposit</option>
-            </select>
+      <div className="rounded-lg border bg-gradient-to-r from-blue-50 to-orange-50 p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75" />
+            </svg>
           </div>
-        )}
-
+          <div>
+            <div className="text-sm font-semibold text-gray-900">Payment Details</div>
+            {customerName && <div className="text-xs text-gray-700">{customerName}</div>}
+          </div>
+        </div>
+        <span className="text-xs font-bold px-2 py-1 rounded bg-orange-100 text-orange-700">
+          {fixedType === 'DEPOSIT' ? 'Deposit' : 'Installment'}
+        </span>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Amount</label>
           <div className="relative">
@@ -180,7 +139,7 @@ function PaymentForm({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Reference / Receipt #</label>
+          <label className="text-sm font-medium text-gray-700">Receipt #</label>
           <input
             type="text"
             value={ref}
@@ -253,7 +212,7 @@ function PaymentForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md bg-orange-600 px-6 py-2 text-sm font-bold text-white shadow-sm hover:bg-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="inline-flex items-center gap-2 rounded-md bg-orange-600 px-6 py-2 text-sm font-bold text-white shadow-sm hover:bg-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {loading ? (
             <span className="flex items-center gap-2">
@@ -264,7 +223,12 @@ function PaymentForm({
               Saving...
             </span>
           ) : (
-            submitLabel
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+              {submitLabel}
+            </>
           )}
         </button>
       </div>

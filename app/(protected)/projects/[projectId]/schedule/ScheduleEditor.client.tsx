@@ -221,7 +221,7 @@ export default function ScheduleEditor({
     if (JSON.stringify(newItems) !== JSON.stringify(items)) {
         setItems(newItems);
     }
-  }, [projectStartDate, gapMinutes, calculateSchedule]); // items is NOT in dependency to avoid loop, we rely on calculateSchedule to use current items? No, that's wrong.
+  }, [projectStartDate, gapMinutes, calculateSchedule, items]); // include items for correctness
   // Wait, if I change 'items' (e.g. add row), I want schedule to update.
   // But updating schedule updates 'items'.
   // I need to separate 'input data' from 'calculated data' or be very careful.

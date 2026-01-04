@@ -34,7 +34,7 @@ export default function CalcBuilder() {
     const init: Record<string, number> = {};
     for (const r of rows) if (r.kind === 'input') init[r.code] = init[r.code] ?? 0;
     setValues((v) => ({ ...init, ...v }));
-  }, []);
+  }, [rows]);
 
   // Compute derived values whenever inputs change
   const computedValues = useMemo(() => {

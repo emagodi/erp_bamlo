@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Parser } from 'expr-eval';
 import { SHEET_COLUMNS, TAKEOFF_LAYOUT } from '@/lib/takeoffLayout';
@@ -82,7 +82,7 @@ export default function TakeOffSheet() {
     return results;
   }
 
-  function applyOverrides(expr: string, code: string): string {
+  const applyOverrides = useCallback((expr: string, code: string): string => {
     const lits = findNumericLiterals(expr);
     if (!lits.length) return expr;
     const overrides = constOverrides[code] || {};
@@ -96,7 +96,7 @@ export default function TakeOffSheet() {
     });
     out += expr.slice(last);
     return out;
-  }
+  }, [constOverrides]);
 
   function renderFormula(expr: string, code: string) {
     const lits = findNumericLiterals(expr);
@@ -191,7 +191,7 @@ export default function TakeOffSheet() {
       }
     }
     return { ctx, missing };
-  }, [vals, constOverrides]);
+  }, [vals, applyOverrides]);
 
   useEffect(() => {
     setMissingByCode(missing);

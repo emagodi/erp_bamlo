@@ -1,15 +1,12 @@
 import { HomeIcon, EnvelopeIcon, GlobeAltIcon } from '@heroicons/react/24/solid';
+import Image from 'next/image';
 
 export default function PrintHeader() {
   return (
     <div className="hidden print:flex flex-row justify-between items-start mb-8 border-b-2 border-barmlo-blue pb-4 w-full">
       <div className="flex flex-col items-center">
         <div className="relative w-48 h-24">
-             <img
-                src="/barmlo_logo.png"
-                alt="Barmlo Logo"
-                className="object-contain w-full h-full"
-              />
+            <Image src="/barmlo_logo.png" alt="Barmlo Logo" fill className="object-contain" />
         </div>
         <p className="text-barmlo-orange italic mt-1 font-medium text-sm">Your happiness is our pride</p>
       </div>

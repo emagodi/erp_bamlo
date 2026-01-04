@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { assertRoles } from '@/lib/workflow';
 import { redirect } from 'next/navigation';
+import clsx from 'clsx';
 import { WorkflowStatusBadge } from '@/components/ui/workflow-status-badge';
 
 import { SearchInput } from '@/components/ui/search-input';
@@ -45,7 +46,7 @@ export default async function ProjectsPage({
   
   let currentTab = 'active';
   if (isSeniorPM) {
-    currentTab = tab === 'assignment' ? 'assignment' : 'active';
+    currentTab = 'assignment';
   } else if (isSalesAccounts) {
     currentTab = tab === 'all_payments' ? 'all_payments' : 'due_today';
   }
@@ -71,6 +72,12 @@ export default async function ProjectsPage({
          where = {
              ...baseWhere,
              assignedToId: null, // Only unassigned
+             status: { notIn: ['CREATED', 'COMPLETED', 'CLOSED'] } // Ready for assignment
+         };
+     } else if (currentTab === 'planning') {
+         where = {
+             ...baseWhere,
+             status: 'CREATED' // Needs planning/scheduling
          };
      } else {
          where = {
@@ -110,9 +117,11 @@ export default async function ProjectsPage({
           select: { 
             number: true, 
             customer: { select: { displayName: true, city: true } },
+            createdBy: { select: { name: true, email: true } }
           } 
         },
         paymentSchedules: { select: { amountMinor: true, paidMinor: true, status: true, dueOn: true, label: true, seq: true } },
+        clientPayments: { select: { amountMinor: true, type: true } },
         assignedTo: { select: { id: true, name: true, email: true } },
       },
       take: pageSize,
@@ -137,7 +146,7 @@ export default async function ProjectsPage({
             <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
             {!isSalesAccounts && (
               <p className="mt-2 text-sm text-gray-600">
-                Manage and track all your construction projects
+                {isSeniorPM ? 'This will just show unassigned projects' : 'Manage and track all your construction projects'}
               </p>
             )}
           </div>
@@ -146,32 +155,7 @@ export default async function ProjectsPage({
           </div>
         </div>
 
-        {isSeniorPM && (
-            <div className="border-b border-gray-200 mb-6">
-              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                <Link
-                  href="/projects?tab=active"
-                  className={`${
-                    currentTab === 'active'
-                      ? 'border-orange-500 text-orange-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-                >
-                  Active Projects
-                </Link>
-                <Link
-                  href="/projects?tab=assignment"
-                  className={`${
-                    currentTab === 'assignment'
-                      ? 'border-orange-500 text-orange-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-                >
-                  Assign Project Manager
-                </Link>
-              </nav>
-            </div>
-        )}
+
 
         {isSalesAccounts ? (
           <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
@@ -212,10 +196,20 @@ export default async function ProjectsPage({
                   ) : (
                     projects.map((project) => {
                       const schedules = (project as any).paymentSchedules || [];
+                      const payments = (project as any).clientPayments || [];
+                      const depositPaidByPayments = payments
+                        .filter((p: any) => p.type === 'DEPOSIT')
+                        .reduce((sum: number, p: any) => sum + Number(p.amountMinor ?? 0), 0);
                       const today = new Date();
                       today.setHours(23, 59, 59, 999);
                       const depositItem = schedules.find((s: any) => String(s.label || '').toLowerCase().includes('deposit')) || null;
-                      const depositBal = depositItem ? Math.max(0, Number(depositItem.amountMinor ?? 0) - Number(depositItem.paidMinor ?? 0)) : 0;
+                      const depositBal = depositItem
+                        ? Math.max(
+                            0,
+                            Number(depositItem.amountMinor ?? 0) -
+                              Math.max(Number(depositItem.paidMinor ?? 0), depositPaidByPayments)
+                          )
+                        : Math.max(0, Number((project as any).depositMinor ?? 0) - depositPaidByPayments);
                       let currentItem: any = null;
                       if (currentTab === 'due_today') {
                         // Prefer deposit if due today or earlier and unpaid, else earliest unpaid installment due today/earlier
@@ -236,12 +230,20 @@ export default async function ProjectsPage({
                             .sort((a: any, b: any) => new Date(a.dueOn).getTime() - new Date(b.dueOn).getTime())[0] || null;
                         }
                       }
-                      let dueBal = currentItem ? Math.max(0, Number(currentItem.amountMinor ?? 0) - Number(currentItem.paidMinor ?? 0)) : 0;
+                      let dueBal = 0;
+                      if (currentItem) {
+                        const isDeposit = String(currentItem.label || '').toLowerCase().includes('deposit');
+                        if (isDeposit) {
+                          dueBal = depositBal;
+                        } else {
+                          dueBal = Math.max(0, Number(currentItem.amountMinor ?? 0) - Number(currentItem.paidMinor ?? 0));
+                        }
+                      }
                       let typeLabel = currentItem
                         ? (String(currentItem.label || '').toLowerCase().includes('deposit') ? 'Deposit' : 'Installment')
                         : '-';
                       if (!currentItem && schedules.length === 0) {
-                        const dep = Number((project as any).depositMinor ?? 0);
+                        const dep = Math.max(0, Number((project as any).depositMinor ?? 0) - depositPaidByPayments);
                         const inst = Number((project as any).installmentMinor ?? 0);
                         if (dep > 0) {
                           dueBal = dep;
@@ -309,6 +311,55 @@ export default async function ProjectsPage({
           <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
             <h3 className="mt-2 text-sm font-medium text-gray-900">No projects found</h3>
             <p className="mt-1 text-sm text-gray-500">No active projects found.</p>
+          </div>
+        ) : isSeniorPM && currentTab === 'assignment' ? (
+          <div className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 p-4">
+             <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                 <thead className="bg-gray-50 dark:bg-gray-900/50">
+                   <tr>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Customer</th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Location</th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Date</th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Logged By</th>
+                     <th scope="col" className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
+                     <th scope="col" className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Assign PM</th>
+                   </tr>
+                 </thead>
+                 <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                   {projects.map((project) => (
+                     <tr key={project.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                         {project.quote?.customer?.displayName || 'Unknown'}
+                       </td>
+                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                         {project.quote?.customer?.city || '-'}
+                       </td>
+                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                         {new Date(project.createdAt).toLocaleDateString()}
+                       </td>
+                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                         {(project.quote as any)?.createdBy?.name || (project.quote as any)?.createdBy?.email || '-'}
+                       </td>
+                       <td className="px-4 py-3 whitespace-nowrap text-center">
+                         <WorkflowStatusBadge status={project.status} />
+                       </td>
+                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                         <ProjectAssigner 
+                           projectId={project.id} 
+                           initialAssigneeId={project.assignedTo?.id} 
+                           projectManagers={projectManagers as any}
+                           variant="table"
+                         />
+                       </td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div>
+             <div className="mt-4">
+                <QuotePagination total={totalCount} currentPage={currentPage} pageSize={pageSize} />
+             </div>
           </div>
         ) : (
           <>
